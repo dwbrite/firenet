@@ -1,0 +1,64 @@
+---
+
+- name: Grow root partition
+  hosts: all
+  tasks:
+    - name: Install dependencies
+      pacman:
+        update_cache: yes
+        name:
+          - cloud-utils
+          - e2fsprogs
+        state: present
+
+    - name: Grow NVME partition
+      community.general.parted:
+        device: /dev/nvme0n1
+        number: 2
+        part_end: 100%
+
+    - name: Get partition size
+      ansible.builtin.command: "blockdev --getsize64 /dev/nvme0n1p2"
+      register: partition_size
+      changed_when: false
+
+    - name: Get filesystem size
+      ansible.builtin.shell: tune2fs -l /dev/nvme0n1p2 | grep 'Block count:' | awk '{ print $3 * 4096 }'
+      register: filesystem_size
+      changed_when: false
+
+    - name: Check if resize is needed
+      set_fact:
+        resize_needed: "{{ (partition_size.stdout | int) > (filesystem_size.stdout | int) }}"
+
+    - name: Resize filesystem
+      ansible.builtin.command: resize2fs /dev/nvme0n1p2
+      register: resize_output
+      changed_when: "'The filesystem on /dev/nvme0n1p2 is now' in resize_output.stdout"
+      when: resize_needed
+
+- name: Add inter-node SSH keys
+  hosts: all
+  vars:
+    private_key_path: "~/.ssh/clementine.pk"
+    public_key_path:  "~/.ssh/clementine.pub"
+  tasks:
+    - name: Add public key to authorized keys
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', public_key_path) }}"
+
+    - name: Enable root SSH login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin yes'
+        validate: '/usr/sbin/sshd -t -f %s'
+      notify: Restart sshd
+
+  handlers:
+    - name: Restart sshd
+      service:
+        name: sshd
+        state: restarted

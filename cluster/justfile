@@ -1,0 +1,28 @@
+# this justfile acts as documentation by example
+
+# secrets.yml is an ansible vault file, locked by a gitignored .vault_pass.
+# said .vault_pass can be found in keepass.
+
+list-inventory:
+  ansible-inventory -i inventory.ini --list
+
+# - adds ssh keypair for inter-node communication
+# - resizes root partition to fill disk
+# initial configuration following manual setup
+init hosts:
+  ansible-playbook -i inventory.ini playbooks/gen_ssh_keys.yml
+  ansible-playbook -i inventory.ini -l {{hosts}} playbooks/init.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
+
+network:
+  ansible-playbook -i inventory.ini -l network playbooks/network.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
+
+edit-secrets:
+  ansible-vault edit secrets.yml --vault-password-file .vault_pass
+
+# runs k0sctl commands on operator machine, applying configuration from config.yml
+create-cluster:
+  env SSH_KNOWN_HOSTS=/dev/null k0sctl apply --config config/k0sctl.yml
+  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config config/k0sctl.yml > ~/.kube/config
+
+reset-cluster:
+  env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config config/k0sctl.yml

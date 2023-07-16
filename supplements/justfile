@@ -1,0 +1,15 @@
+install machine: (hostname machine) dd cleanup
+
+hostname machine:
+    sudo hostnamectl hostname {{machine}}
+    - avahi-set-host-name {{machine}}
+    sudo rm /etc/machine-id
+    sudo systemd-machine-id-setup
+
+dd:
+    sudo bash -c 'cat /dev/mmcblk0 >> /dev/nvme0n1'
+
+cleanup:
+    sleep 5
+    sudo hostnamectl hostname clementine-proto
+    avahi-set-host-name clementine-proto

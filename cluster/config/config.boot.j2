@@ -1,0 +1,280 @@
+firewall {
+    interface eth0 {
+        in {
+            name WAN-IN
+        }
+        local {
+            name WAN-LOCAL
+        }
+    }
+    name WAN-IN {
+        default-action drop
+        rule 10 {
+            action accept
+            state {
+                established enable
+                related enable
+            }
+        }
+        rule 80 {
+            action accept
+            state {
+                new enable
+            }
+            destination {
+                address cluster_ip
+                port 80
+            }
+            protocol tcp
+        }
+    }
+    name WAN-LOCAL {
+        default-action drop
+        rule 10 {
+            action accept
+            state {
+                established enable
+                related enable
+            }
+        }
+        rule 20 {
+            action accept
+            icmp {
+                type-name echo-request
+            }
+            protocol icmp
+            state {
+                new enable
+            }
+        }
+        rule 30 {
+            action drop
+            destination {
+                port 22
+            }
+            protocol tcp
+            recent {
+                count 4
+                time minute
+            }
+            state {
+                new enable
+            }
+        }
+        rule 31 {
+            action accept
+            destination {
+                port 22
+            }
+            protocol tcp
+            state {
+                new enable
+            }
+        }
+    }
+}
+interfaces {
+    ethernet eth0 {
+        address dhcp
+        description WAN
+    }
+    ethernet eth1 {
+        address {{ gateway_cidr }}
+        description LAN
+    }
+    loopback lo {
+    }
+}
+nat {
+    source {
+        /*if it's outbound, nat out*/
+        rule 100 {
+            outbound-interface any
+            source {
+                address {{ network_cidr }}
+            }
+            translation {
+                address masquerade
+            }
+        }
+    }
+
+    destination {
+        /* port forward from wan */
+        rule 80 {
+            description web-server-wan
+            destination {
+                port 80
+            }
+            inbound-interface eth0
+            protocol tcp
+            translation {
+                address cluster_ip
+                port 80
+            }
+        }
+    }
+}
+protocols {
+    static {
+        arp {
+            interface eth1 {
+                address {{ aster.addr }} {
+                    mac {{ aster.mac }}
+                }
+                address {{ bernadette.addr }} {
+                    mac {{ bernadette.mac }}
+                }
+                address {{ charlie.addr }} {
+                    mac {{ charlie.mac }}
+                }
+            }
+        }
+    }
+}
+service {
+    dhcp-server {
+        shared-network-name LAN {
+            subnet {{ network_cidr }} {
+                default-router {{ gateway_addr }}
+                domain-name {{ domain }}
+                lease 86400
+                name-server {{ gateway_addr }}
+                range 0 {
+                    start {{ dhcp.start }}
+                    stop {{ dhcp.end }}
+                }
+                static-mapping aster {
+                    ip-address  {{ aster.addr }}
+                    mac-address {{ aster.mac }}
+                }
+                static-mapping bernadette {
+                    ip-address  {{ bernadette.addr }}
+                    mac-address {{ bernadette.mac }}
+                }
+                static-mapping charlie {
+                    ip-address  {{ charlie.addr }}
+                    mac-address {{ charlie.mac }}
+                }
+            }
+        }
+    }
+    dns {
+        forwarding {
+            name-server 9.9.9.9
+            name-server 8.8.8.8
+            allow-from {{ network_cidr }}
+            authoritative-domain {{ domain }} {
+                records {
+                    a @ {
+                        address cluster_ip
+                    }
+                    a any {
+                        address cluster_ip
+                    }
+                    a gateway {
+                        address {{ gateway_addr }}
+                    }
+                    a aster {
+                        address {{ aster.addr }}
+                    }
+                    a bernadette {
+                        address {{ bernadette.addr }}
+                    }
+                    a charlie {
+                        address {{ charlie.addr }}
+                    }
+                }
+            }
+            cache-size 0
+            listen-address {{ gateway_addr }}
+        }
+    }
+    ntp {
+        allow-client {
+            address 0.0.0.0/0
+            address ::/0
+        }
+        server time1.vyos.net {
+        }
+        server time2.vyos.net {
+        }
+        server time3.vyos.net {
+        }
+    }
+    ssh {
+        disable-password-authentication
+        port 22
+    }
+}
+
+/* port forwarding */
+firewall {
+    name WAN-IN {
+        rule 80 {
+            action accept
+            state {
+                new enable
+            }
+            destination {
+                address cluster_ip
+                port 80
+            }
+            protocol tcp
+        }
+    }
+}
+
+
+system {
+    name-server 9.9.9.9
+    name-server 8.8.8.8
+    config-management {
+        commit-revisions 100
+    }
+    conntrack {
+        modules {
+            ftp
+            h323
+            nfs
+            pptp
+            sip
+            sqlnet
+            tftp
+        }
+    }
+    console {
+        device ttyS0 {
+            speed 115200
+        }
+    }
+    domain-search {
+        domain {{ domain }}
+    }
+    host-name gateway
+    login {
+        user vyos {
+            authentication {
+                plaintext-password {{ vyos_password }}
+                public-keys clementine {
+                    key "AAAAB3NzaC1yc2EAAAADAQABAAACAQChc06n/QeUiCxAJ5JOxf7QccoE4v1qdZbnpiuazdU/52TbgocrkLfexcWzb8j+o+rrQXDsXHpAvUccpWHXiMGd44LEMPYtONgKs9ztS2EMQw2RgAN0QswrzXAdD7v/8g2lZFiKIkgQIHCrwXnbxPClThfpMKndcILQGvzNgCv7IYtDQjErfbHQax3DiQyZKv23yVIsZkpFkxDyaYNk5TrQUDrSW8apLnhp1/0YipHASxupnuv4ZOo3fna2TidWra2TYsC4x71XTX7bx/Ecj0G1S0XDV1LBdWy8c9rrI3dDlSJ7peMbsqLWzn7XFFM1e4Nev9WZseencNPebKBsEKdixJMDCYAhW026nODkho+wTgdegR1idVA73nQHj1orJWFuEREzF07T/6O46WXUcvTbqVm9MHDi0nvOUDwQzJSE1jM5r5JvDMtf74yd2LWCL7t5EVg32uqxRhMUEXvmVjhRlUHRyBfDfpL8uGIKQQNKXU9TjynyXnwMzBC1uvXn9fSfiz9j+AgMox5nA6PfUYVUspgRI4+veSUKO9FWedTNSYbQmHWZHGmQUwQ8RxPgYfmwupUx37kiPRcyXeb5MtFnHECqK0Wou0vFnXmgJGZmEOwJhPIdm8QAlXzxSaLwIQQleVOVyQCDakfS2YSCUdr8/fSA36onycbmXT5drKtMcQ=="
+                    type ssh-rsa
+                }
+                public-keys dwbrite {
+                    key "AAAAB3NzaC1yc2EAAAADAQABAAACAQCtmgIBfgKOO0oZfpVvk9bZiz7Lbyx6Ur6fiwaCtzV853D0wTM9+zMqESDwDwqLjIDDuMJTAl4GLq+rfIwdR1Jc0gfjSPt972xe1bXQ3qZm+yuEOnqSGxGSDrXpmhx6sIcYCOyWIRNeZgRjayQxRD9aR+mbuR6Pmub+ENIs9N9+CaYOeWUCnNLO8J93zFug3wztYevLGsicPE1otamfih3DPI8h9Ty+gkYUC8J+cEORGHWR1NValKF3Q6g6cAA+xgP+OWZDqGV2w97Kz861SVr8eg7bEck3fK/r+IDANQyiKjt1vODAN8U+LKuxS+IUcM+v6LlGFpBz64XA2Px27Qw2Yu3sddw4AZaPPMvnx49QTBe857Z31WlCc7kVNdFxyXTpwjwH8cX9Z/5QDfJ3er1O1DJIhW05S7LXotENsPYsavlLHNrgC5s5u2SjWnpsyscoqaFYuSpoDPy+5KY5f/asI8PXi0FCXZl8xmgLgcZHJupnL3eqxeEWQfYmzbUFnszkXTg2suS3kbYOrF85xK5Zw1f56jh3HTwyapZxorISpJ8R3sAwVFbFhcYPlLhg6E4DyX1ofi9j43gWwgF83QjLUsDJfEQkqJvtDa0CUuyAZ/QEQ8toXWwrfjH068WRPBNpHfjXBVmKvxymZmCGmcHkNdr7yMcjisWOPQ8AFGvgZw== cardno:19 197 571"
+                    type ssh-rsa
+                }
+            }
+        }
+    }
+    syslog {
+        global {
+            facility all {
+                level info
+            }
+            facility local7 {
+                level debug
+            }
+        }
+    }
+}

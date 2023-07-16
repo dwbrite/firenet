@@ -1,0 +1,30 @@
+---
+network_cidr: '10.11.1.0/24'
+gateway_cidr: "{{ network_cidr | ansible.utils.ipaddr('1') }}"
+gateway_addr: "{{ gateway_cidr | ansible.utils.ipaddr('address') }}"
+dhcp:
+  start:  "{{ network_cidr | ansible.utils.ipaddr('100') | ansible.utils.ipaddr('address') }}"
+  end:    "{{ network_cidr | ansible.utils.ipaddr('254') | ansible.utils.ipaddr('address') }}"
+
+# clementine lives at x.x.x.80 - x.x.x.96
+clementine_subnet:  "{{ network_cidr | ansible.utils.ipsubnet(28, 5) }}"
+
+# the sole address in the MetalLB IPAddressPool, for ingress routing (see: nginx ingress controller)
+cluster_ip: "{{ clementine_subnet | ansible.utils.ipsubnet(32, 0) | ansible.utils.ipaddr('address') }}"
+
+# static IP addresses for cluster workers
+aster:
+  addr: "{{ clementine_subnet | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+  mac: "c6:f4:bd:8a:f0:7e"
+bernadette:
+  addr:  "{{ clementine_subnet | ansible.utils.ipaddr('2') | ansible.utils.ipaddr('address') }}"
+  mac: "32:2d:6a:8f:02:d3"
+charlie:
+  addr:     "{{ clementine_subnet | ansible.utils.ipaddr('3') | ansible.utils.ipaddr('address') }}"
+  mac: "7a:fc:cc:12:3c:bc"
+
+
+domain: "tiny.pizza"
+
+vyos_user: 'vyos'
+

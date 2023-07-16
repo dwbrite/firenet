@@ -1,0 +1,18 @@
+---
+- name: Configure VyOS using config file
+  hosts: network
+  gather_facts: no
+  connection: network_cli
+#  become: yes
+#  become_method: enable
+  remote_user: "{{ vyos_user }}"
+  vars_files:
+    - ../vars.yml
+  vars:
+    ansible_command_timeout: 60
+  tasks:
+    - name: Load configuration from file
+      vyos.vyos.vyos_config:
+        src: ../config/config.boot.j2
+        save: true
+        match: none

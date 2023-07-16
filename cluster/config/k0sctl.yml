@@ -1,0 +1,83 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: clementine
+spec:
+  hosts:
+    - role: controller
+      os: debian
+      ssh:
+        address: gateway
+        user: vyos
+        keyPath: "~/.ssh/clementine.pk"
+    - role: worker
+      ssh:
+        address: aster
+        user: root
+        keyPath: "~/.ssh/clementine.pk"
+    - role: worker
+      ssh:
+        address: bernadette
+        user: root
+        keyPath: "~/.ssh/clementine.pk"
+    - role: worker
+      ssh:
+        address: charlie
+        user: root
+        keyPath: "~/.ssh/clementine.pk"
+  k0s:
+    version: 'v1.27.3+k0s.0'
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: ClusterConfig
+      metadata:
+        name: clementine
+      spec:
+        network:
+          provider: calico
+          calico: null
+          kuberouter: null
+          kubeProxy:
+            mode: ipvs
+            ipvs:
+              strictARP: true
+        extensions:
+          helm:
+            repositories:
+              - name: metallb
+                url: https://metallb.github.io/metallb
+              - name: stable
+                url: https://charts.helm.sh/stable
+              - name: prometheus-community
+                url: https://prometheus-community.github.io/helm-charts
+            charts:
+              - name: metallb
+                chartname: metallb/metallb
+                namespace: metallb
+              - name: prometheus-stack
+                chartname: prometheus-community/prometheus
+                version: "14.6.1"
+                order: 1
+                values: |
+                  alertmanager:
+                    persistentVolume:
+                      enabled: false
+                  server:
+                    persistentVolume:
+                      enabled: false
+                namespace: default
+              # We don't need to specify the repo in the repositories section for OCI charts
+              - name: oci-chart
+                chartname: oci://registry:8080/chart
+                version: "0.0.1"
+                order: 2
+                values: ""
+                namespace: default
+              # Other way is to use local tgz file with chart
+              # the file must exist on all controller nodes
+              - name: tgz-chart
+                chartname: /tmp/chart.tgz
+                version: "0.0.1"
+                order: 2
+                values: ""
+                namespace: default
