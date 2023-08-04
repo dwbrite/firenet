@@ -1,0 +1,104 @@
+---
+- name: Instal docker
+  hosts: proxies
+  become: true
+  tasks:
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key.
+      ansible.builtin.get_url:
+        url: "https://download.docker.com/linux/debian/gpg"
+        dest: /etc/apt/trusted.gpg.d/docker.asc
+        mode: '0644'
+        force: true
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian bookworm stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        pkg:
+          - docker-ce
+          - python3-docker
+        state: latest
+        update_cache: true
+
+
+- name: Run ddns client (inadyn) docker container
+  hosts: proxies
+  become: true
+  tasks:
+    - name: Pull inadyn docker image
+      community.docker.docker_image:
+        name: "troglobit/inadyn"
+        source: pull
+        state: present
+
+    - name: Create /config/inadyn
+      file:
+        path: "/config/inadyn"
+        state: directory
+
+    - name: Copy inadyn.conf # todo: template
+      ansible.builtin.copy:
+        src: "{{inventory_dir}}/config/inadyn.conf"
+        dest: "/config/inadyn/inadyn.conf"
+
+    - name: Create inadyn container
+      community.docker.docker_container:
+        name: "inadyn"
+        image: "troglobit/inadyn"
+        state: started
+        recreate: true
+        volumes:
+          - "/config/inadyn:/etc"
+
+
+- name: Run nginx docker container (forward proxy)
+  hosts: proxies
+  become: true
+  tasks:
+    - name: Pull nginx docker image
+      community.docker.docker_image:
+        name: "nginx"
+        source: pull
+        state: present
+
+    - name: Create /config/nginx
+      file:
+        path: "/config/nginx"
+        state: directory
+
+    - name: Copy nginx.conf
+      ansible.builtin.copy:
+        src: "{{inventory_dir}}/config/empty.nginx.conf"
+        dest: "/config/nginx/nginx.conf"
+
+    - name: Create nginx container
+      community.docker.docker_container:
+        name: "nginx-proxy"
+        image: "nginx"
+        state: started
+        recreate: true
+        network_mode: "host"
+        volumes:
+          - "/config/nginx/nginx.conf:/etc/nginx/nginx.conf"

@@ -13,21 +13,23 @@ This is my attempt at doing so.
 - ansible (pip/netaddr)
 - k0sctl (go)
 - terraform
+- helm
 
 ## hardware
+
+On my home network I'm running VyOS as a programmable router/firewall.
 
 I've got three `Orange Pi 5`s with 256GB of NVMe storage and 8-16GB of RAM.
 In 7-8 months, it will become cost-saving to self-host,
 and I will have significantly more capable systems.
 
-In addition to that, I have an x86 firewall running VyOS, 
-which also acts as the k0s controller. Mostly because 
-k0s does not support running aarch64 controllers. Yet.
+In addition to that, I pay for a very cheap VM from BuyVM to act as a forward proxy/port redirector. 
 
 
 |      alias | role                  | MAC address       |
 |-----------:|-----------------------|:------------------|
 |    gateway | firewall + controller | --                |
+|      proxy | proxy                 | --                |
 |      aster | worker                | c6:f4:bd:8a:f0:7e |
 | bernadette | worker                | 32:2d:6a:8f:02:d3 |
 |    charlie | worker                | 7a:fc:cc:12:3c:bc |
@@ -62,3 +64,16 @@ including setting up an SSH key and disabling password authentication.
 
 Once the network was reachable with sshd running, 
 further configuration can be handled with a config file deployed through Ansible.
+
+### proxy
+
+The proxy server runs nginx as a docker container in host network mode, 
+as well as ddclient (actually inadyn).
+The nginx.config is updated up to once a minute from a pod running in k8s, 
+and redirects ports based on the ingress controller.
+
+
+# TODO:
+
+- compile config.boot.j2 here, upload to vyos, and run a load command instead of using the vyos_config module, which maintains extraneous state.
+- in config.boot.j2, turn hosts, ports and subdomains into lists instead of named items

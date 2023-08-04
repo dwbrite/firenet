@@ -23,6 +23,8 @@ bernadette:
 charlie:
   addr: "{{ clementine_subnet | ansible.utils.ipaddr('3') | ansible.utils.ipaddr('address') }}"
   mac: "7a:fc:cc:12:3c:bc"
+proxy:
+  addr: "199.195.252.45"
 
 domain: "home.arpa"
 
