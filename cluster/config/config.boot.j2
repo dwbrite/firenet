@@ -16,14 +16,14 @@ firewall {
                 related enable
             }
         }
-        rule 80 {
+        rule 30 {
             action accept
             state {
                 new enable
             }
             destination {
-                address cluster_ip
-                port 80
+                address {{ cluster_ip }}
+                port 80,443
             }
             protocol tcp
         }
@@ -101,16 +101,15 @@ nat {
 
     destination {
         /* port forward from wan */
-        rule 80 {
+        rule 30 {
             description web-server-wan
             destination {
-                port 80
+                port 80,443
             }
             inbound-interface eth0
             protocol tcp
             translation {
-                address cluster_ip
-                port 80
+                address {{ cluster_ip }}
             }
         }
     }
@@ -166,14 +165,11 @@ service {
             allow-from {{ network_cidr }}
             authoritative-domain {{ domain }} {
                 records {
-                    a @ {
-                        address cluster_ip
-                    }
-                    a any {
-                        address cluster_ip
-                    }
                     a gateway {
                         address {{ gateway_addr }}
+                    }
+                    a proxy {
+                        address {{ proxy.addr }}
                     }
                     a aster {
                         address {{ aster.addr }}
@@ -207,24 +203,6 @@ service {
         port 22
     }
 }
-
-/* port forwarding */
-firewall {
-    name WAN-IN {
-        rule 80 {
-            action accept
-            state {
-                new enable
-            }
-            destination {
-                address cluster_ip
-                port 80
-            }
-            protocol tcp
-        }
-    }
-}
-
 
 system {
     name-server 9.9.9.9
