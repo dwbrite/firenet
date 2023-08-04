@@ -1,7 +1,26 @@
 ---
+- name: Create cluster SSH key pair
+  hosts: localhost
+  vars:
+    private_key_path: "~/.ssh/clementine.pk"
+    public_key_path:  "~/.ssh/clementine.pub"
+  tasks:
+    - name: Generate a new SSH key pair
+      openssh_keypair:
+        path: "{{ private_key_path }}"
+        size: 4096
+      register: ssh_key
+
+    - name: Save public key
+      copy:
+        content: "{{ ssh_key.public_key }}"
+        dest: "{{ public_key_path }}"
+        mode: '0644'
+
+---
 
 - name: Grow root partition
-  hosts: all
+  hosts: workers
   tasks:
     - name: Install dependencies
       pacman:
@@ -37,8 +56,10 @@
       changed_when: "'The filesystem on /dev/nvme0n1p2 is now' in resize_output.stdout"
       when: resize_needed
 
+---
+
 - name: Add inter-node SSH keys
-  hosts: all
+  hosts: cluster
   vars:
     private_key_path: "~/.ssh/clementine.pk"
     public_key_path:  "~/.ssh/clementine.pub"

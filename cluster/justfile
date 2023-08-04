@@ -9,9 +9,8 @@ list-inventory:
 # - adds ssh keypair for inter-node communication
 # - resizes root partition to fill disk
 # initial configuration following manual setup
-init hosts:
-  ansible-playbook -i inventory.ini playbooks/gen_ssh_keys.yml
-  ansible-playbook -i inventory.ini -l {{hosts}} playbooks/init.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
+init-cluster-hardware:
+  ansible-playbook -i inventory.ini -l all playbooks/cluster.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
 
 network:
   ansible-playbook -i inventory.ini -l network playbooks/network.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
