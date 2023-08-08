@@ -4,18 +4,21 @@
   vars:
     private_key_path: "~/.ssh/clementine.pk"
     public_key_path:  "~/.ssh/clementine.pub"
+    run_ssh_key_gen: false
   tasks:
     - name: Generate a new SSH key pair
       openssh_keypair:
         path: "{{ private_key_path }}"
         size: 4096
       register: ssh_key
+      when: run_ssh_key_gen
 
     - name: Save public key
       copy:
         content: "{{ ssh_key.public_key }}"
         dest: "{{ public_key_path }}"
         mode: '0644'
+      when: run_ssh_key_gen
 
 ---
 
