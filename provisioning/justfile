@@ -12,9 +12,11 @@ list-inventory:
 init-cluster-hardware:
   ansible-playbook -i inventory.ini -l all playbooks/cluster.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
 
+# modifies vyos configuration to match the config file
 network:
   ansible-playbook -i inventory.ini -l network playbooks/network.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
 
+#
 configure-proxies:
   ansible-playbook -i inventory.ini -l proxy playbooks/proxies.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
 
@@ -28,3 +30,10 @@ create-cluster:
 
 reset-cluster:
   env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config config/k0sctl.yml
+
+deploy-argocd:
+  helm repo add argo https://argoproj.github.io/argo-helm
+  helm repo update
+  kubectl get ns argocd || kubectl create ns argocd # create namespace if it doesn't exist
+  helm upgrade --install argocd argo/argo-cd --namespace argocd # install or upgrade
+  kubectl apply -f argocd.yml
