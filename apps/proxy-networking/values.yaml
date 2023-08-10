@@ -1,0 +1,11 @@
+serviceAccountName: ip-watcher
+clusterRoleName: ip-proxy-role
+clusterRoleBindingName: ip-proxy-role-binding
+
+proxyUser: root
+proxyHost: tiny.pizza
+secretName: proxy-server-ssh-key
+
+configMapName: proxy-update-script
+deploymentName: proxy-updater
+image: python:3.11

@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMapName }}
+  namespace: {{ .Release.Namespace }}
+data:
+  update_script.py: |
+    {{ .Files.Get "files/update_script.py" | nindent 4 }}
+  requirements.txt: |
+    {{ .Files.Get "files/requirements.txt" | nindent 4 }}
+
+---
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deploymentName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.deploymentName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deploymentName }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
+
+      volumes:
+        - name: script
+          configMap:
+            name: {{ .Values.configMapName }}
+
+      containers:
+        - name: {{ .Values.deploymentName }}
+          image: {{ .Values.image }}
+
+          command: ["/bin/bash", "-c", "pip install -r /scripts/requirements.txt && python -u /scripts/update_script.py"]
+
+          volumeMounts:
+            - name: script
+              mountPath: "/scripts"
+              readOnly: true
+
+          env:
+            - name: KUBERNETES_SERVICE_HOST
+              value: "kubernetes.default.svc"
+            - name: KUBERNETES_SERVICE_PORT
+              value: "6443"
+            - name: SECRET_NAME
+              value: {{ .Values.secretName }}
+            - name: SECRET_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: PROXY_HOST
+              value: {{ .Values.proxyHost }}
+            - name: PROXY_USER
+              value: {{ .Values.proxyUser }}
+
+      restartPolicy: Always
