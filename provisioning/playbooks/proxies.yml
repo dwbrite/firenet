@@ -1,5 +1,5 @@
 ---
-- name: Instal docker
+- name: Install docker
   hosts: proxies
   become: true
   tasks:
