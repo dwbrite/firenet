@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-app
+spec:
+  source:
+    repoURL: https://github.com/dwbrite/firenet
+    path: apps/metallb
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
