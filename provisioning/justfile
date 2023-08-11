@@ -30,10 +30,3 @@ create-cluster:
 
 reset-cluster:
   env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config config/k0sctl.yml
-
-deploy-argocd:
-  helm repo add argo https://argoproj.github.io/argo-helm
-  helm repo update
-  kubectl get ns argocd || kubectl create ns argocd # create namespace if it doesn't exist
-  helm upgrade --install argocd argo/argo-cd --namespace argocd # install or upgrade
-  kubectl apply -f argocd.yml
