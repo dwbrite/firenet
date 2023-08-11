@@ -7,7 +7,7 @@
 #  become_method: enable
   remote_user: "{{ vyos_user }}"
   vars_files:
-    - ../vars.yml
+    - ../vars.yaml
   vars:
     ansible_command_timeout: 60
   tasks:

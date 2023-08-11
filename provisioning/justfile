@@ -1,6 +1,6 @@
 # this justfile acts as documentation by example
 
-# secrets.yml is an ansible vault file, locked by a gitignored .vault_pass.
+# secrets.yaml is an ansible vault file, locked by a gitignored .vault_pass.
 # said .vault_pass can be found in keepass.
 
 list-inventory:
@@ -10,23 +10,23 @@ list-inventory:
 # - resizes root partition to fill disk
 # initial configuration following manual setup
 init-cluster-hardware:
-  ansible-playbook -i inventory.ini -l all playbooks/cluster.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
+  ansible-playbook -i inventory.ini -l all playbooks/cluster.yaml --vault-password-file .vault_pass --extra-vars '@secrets.yaml'
 
 # modifies vyos configuration to match the config file
 network:
-  ansible-playbook -i inventory.ini -l network playbooks/network.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
+  ansible-playbook -i inventory.ini -l network playbooks/network.yaml --vault-password-file .vault_pass --extra-vars '@secrets.yaml'
 
 #
 configure-proxies:
-  ansible-playbook -i inventory.ini -l proxy playbooks/proxies.yml --vault-password-file .vault_pass --extra-vars '@secrets.yml'
+  ansible-playbook -i inventory.ini -l proxy playbooks/proxies.yaml --vault-password-file .vault_pass --extra-vars '@secrets.yaml'
 
 edit-secrets:
-  ansible-vault edit secrets.yml --vault-password-file .vault_pass
+  ansible-vault edit secrets.yaml --vault-password-file .vault_pass
 
-# runs k0sctl commands on operator machine, applying configuration from config.yml
+# runs k0sctl commands on operator machine, applying configuration from config.yaml
 create-cluster:
-  env SSH_KNOWN_HOSTS=/dev/null k0sctl apply --config config/k0sctl.yml
-  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config config/k0sctl.yml > ~/.kube/config
+  env SSH_KNOWN_HOSTS=/dev/null k0sctl apply --config config/k0sctl.yaml
+  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config config/k0sctl.yaml > ~/.kube/config
 
 reset-cluster:
-  env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config config/k0sctl.yml
+  env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config config/k0sctl.yaml
