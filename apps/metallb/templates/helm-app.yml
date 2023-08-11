@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.helmApp.name }}
+  namespace: {{ .Values.helmApp.namespace }}
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.helmApp.repoURL }}
+    targetRevision: {{ .Values.helmApp.targetRevision }}
+    chart: {{ .Values.helmApp.chartName }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.destNamespace }}
+  syncPolicy:
+    automated: {}
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /spec/conversion/webhook/clientConfig/caBundle

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: metallb-config
+description: A Helm chart for MetaLB configuration
+version: 0.1.0

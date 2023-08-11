@@ -1,0 +1,6 @@
+apiVersion: v2
+name: metallb-app-of-apps
+description: App of apps to create MetalLB and some resources
+type: application
+version: 0.1.0
+appVersion: 1.0.0
