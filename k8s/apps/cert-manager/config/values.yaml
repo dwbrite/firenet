@@ -1,0 +1,8 @@
+namespace: cert-manager
+
+clusterIssuer:
+  name: letsencrypt-prod
+  email: dwbrite@gmail.com
+  acmeServer: https://acme-v02.api.letsencrypt.org/directory
+  privateKeySecret: letsencrypt-prod-pkey
+  cloudflareApiTokenSecret: cloudflare-dns-token

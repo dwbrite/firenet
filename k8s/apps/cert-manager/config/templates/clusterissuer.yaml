@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.clusterIssuer.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  acme:
+    # Email address used for ACME registration
+    email: {{ .Values.clusterIssuer.email }}
+    # Server URL for Let's Encrypt's production environment
+    server: {{ .Values.clusterIssuer.acmeServer }}
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: {{ .Values.clusterIssuer.privateKeySecret }}
+    solvers:
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: {{ .Values.clusterIssuer.cloudflareApiTokenSecret }}
+              key: api-token
