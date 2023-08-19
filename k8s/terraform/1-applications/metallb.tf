@@ -5,32 +5,6 @@ resource "kubernetes_namespace" "metallb" {
   }
 }
 
-resource "kubernetes_manifest" "metallb_helm" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "metallb-helm"
-      namespace = "argocd" # TODO: template me from tf output
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = "https://charts.bitnami.com/bitnami"
-        targetRevision = "4.6.3"
-        chart          = "metallb"
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = kubernetes_namespace.metallb.metadata[0].name
-      }
-      syncPolicy = {
-        automated = {}
-      }
-    }
-  }
-}
-
 resource "kubernetes_manifest" "metallb_app" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
