@@ -11,13 +11,34 @@ spec:
     chart: openebs
     helm:
       values: |
+        image:
+          repo: xin3liang
+
+        nodeSelector:
+          kubernetes.io/arch: arm64
+
+        csi:
+          image:
+            registry: docker.io
+            repo: xin3liang
+          node:
+            kubeletDir: /var/snap/microk8s/common/var/lib/kubelet
+
         mayastor:
-          enabled: true
-          nodeSelector: {}
-          io_engine:
-            nodeSelector:
-              openebs.io/engine: mayastor
-              kubernetes.io/arch: arm64
+          nodeSelector:
+            kubernetes.io/arch: arm64
+
+        etcd:
+          image:
+            repository: xin3liang/bitnami-etcd
+            tag: 3.5.1-debian-10-r67
+          replicaCount: 1
+          volumePermissions:
+            image:
+              repository: xin3liang/bitnami-shell
+
+        loki-stack:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: {{ .Values.destNamespace }}
