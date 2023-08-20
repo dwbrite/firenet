@@ -12,7 +12,7 @@ spec:
     helm:
       values: |
         namespace: {{ .Values.destNamespace }}
-        diskpools: {{- toYaml .Values.diskpools | nindent 4 }}
+        diskpools: {{- toYaml .Values.diskpools | nindent 10 }}
   destination:
     server: https://kubernetes.default.svc
     namespace: {{ .Values.destNamespace }}
