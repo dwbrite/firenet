@@ -1,0 +1,11 @@
+destNamespace: openebs-system
+argoNamespace: argocd
+version: v3.8.0
+
+diskpools:
+  - node: "aster"
+    disk: "/dev/nvme0n1"
+  - node: "bernadette"
+    disk: "/dev/nvme0n1"
+  - node: "charlie"
+    disk: "/dev/nvme0n1"

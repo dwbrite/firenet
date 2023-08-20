@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openebs.diskpools
+  namespace: {{ .Values.argoNamespace }}
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/dwbrite/firenet.git
+    path: k8s/apps/openebs/diskpools
+    targetRevision: HEAD
+    helm:
+      values: |
+        namespace: {{ .Values.destNamespace }}
+        diskpools: {{ .Values.diskpools }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.destNamespace }}
+  syncPolicy:
+    automated: {}
