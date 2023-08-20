@@ -7,5 +7,5 @@ metadata:
   namespace: {{ $.Values.namespace }}
 spec:
   node: {{ .node }}
-  disks: [{{ .disk }}]
+  disks: ["{{ .disk }}"]
 {{- end }}
