@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: openebs.openebs
+  name: openebs-openebs
   namespace: {{ .Values.argoNamespace }}
 spec:
   project: default

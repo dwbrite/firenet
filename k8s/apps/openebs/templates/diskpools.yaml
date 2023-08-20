@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: openebs.diskpools
+  name: openebs-diskpools
   namespace: {{ .Values.argoNamespace }}
 spec:
   project: default
