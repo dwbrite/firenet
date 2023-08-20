@@ -13,6 +13,7 @@ spec:
       values: |
         mayastor:
           enabled: true
+          nodeSelector: {}
           io_engine:
             nodeSelector:
               openebs.io/engine: mayastor
