@@ -25,6 +25,7 @@ spec:
             kubeletDir: /var/snap/microk8s/common/var/lib/kubelet
 
         mayastor:
+          enabled: true
           nodeSelector:
             kubernetes.io/arch: arm64
 
