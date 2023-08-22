@@ -1,6 +1,0 @@
-apiVersion: v2
-name: openebs-diskpools
-description: Create openebs/mayastor diskpools on each node
-type: application
-version: 0.1.0
-appVersion: 1.0.0

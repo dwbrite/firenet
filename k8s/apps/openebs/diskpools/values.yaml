@@ -1,9 +1,0 @@
-namespace: "openebs-system"
-
-diskpools:
-  - node: "aster"
-    disk: "/dev/nvme0n1"
-  - node: "bernadette"
-    disk: "/dev/nvme0n1"
-  - node: "charlie"
-    disk: "/dev/nvme0n1"

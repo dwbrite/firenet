@@ -1,29 +1,31 @@
-
-resource "kubernetes_namespace" "openebs" {
+resource "kubernetes_namespace" "longhorn" {
   metadata {
-    name = "openebs-system"
+    name = "longhorn-system"
   }
 }
 
-resource "kubernetes_manifest" "openebs_app" {
+resource "kubernetes_manifest" "longhorn" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
     metadata = {
-      name = "openebs"
+      name = "longhorn"
       namespace = "argocd" # TODO: template me from tf output
     }
     spec = {
       project = "default"
       source = {
-        repoURL        = "https://github.com/dwbrite/firenet.git"
-        path           = "k8s/apps/openebs"
-        targetRevision = "HEAD"
-        helm = {}
+        repoURL        = "https://charts.longhorn.io"
+        chart           = "longhorn"
+        targetRevision = "1.4.3"
+        helm = {
+          values = <<-EOT
+          EOT
+        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"
-        namespace = kubernetes_namespace.openebs.metadata[0].name
+        namespace = kubernetes_namespace.longhorn.metadata[0].name
       }
       syncPolicy = {
         automated = {
