@@ -32,7 +32,6 @@ In addition to that, I pay for a very cheap VM from BuyVM to act as a forward pr
 |      proxy | proxy                 | --                |
 |      aster | worker                | c6:f4:bd:8a:f0:7e |
 | bernadette | worker                | 32:2d:6a:8f:02:d3 |
-|    charlie | worker                | 7a:fc:cc:12:3c:bc |
 
 
 ## machine configuration
@@ -44,6 +43,8 @@ I did this manually with the Orange Pi debian images.
 
 Following that, I installed RebornOS onto an SD card on one of the machines.
 Then I configured ssh and just.
+Unfortunately, RebornOS (now BredOS) doesn't have the iscsi kernel modules available,
+so I was forced to move to Joshua Riek's [ubuntu-rockchip](https://github.com/Joshua-Riek/ubuntu-rockchip) distro.
 
 I brought the preconfigured SD card to each machine, booted them up, 
 logged in via SSH (thanks to that image having a constant mDNS name),

@@ -20,11 +20,6 @@ spec:
         address: bernadette
         user: root
         keyPath: "~/.ssh/clementine.pk"
-    - role: worker
-      ssh:
-        address: charlie
-        user: root
-        keyPath: "~/.ssh/clementine.pk"
   k0s:
     version: 'v1.27.4+k0s.0'
     config:

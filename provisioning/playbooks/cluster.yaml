@@ -3,7 +3,7 @@
   hosts: localhost
   vars:
     private_key_path: "~/.ssh/clementine.pk"
-    public_key_path:  "~/.ssh/clementine.pub"
+    public_key_path: "~/.ssh/clementine.pub"
     run_ssh_key_gen: false
   tasks:
     - name: Generate a new SSH key pair
@@ -20,12 +20,22 @@
         mode: '0644'
       when: run_ssh_key_gen
 
----
-
 - name: Grow root partition
-  hosts: workers
+  hosts: all_workers
   tasks:
-    - name: Install dependencies
+    - name: Update ubuntu apt cache
+      when: "'ubuntu_workers' in group_names"
+      ansible.builtin.apt:
+        update_cache: yes
+    - name: Install ubuntu packages
+      when: "'ubuntu_workers' in group_names"
+      ansible.builtin.apt:
+        pkg:
+          - cloud-utils
+          - e2fsprogs
+        state: present
+    - name: Install reborn packages
+      when: "'reborn_workers' in group_names"
       pacman:
         update_cache: yes
         name:
@@ -59,13 +69,33 @@
       changed_when: "'The filesystem on /dev/nvme0n1p2 is now' in resize_output.stdout"
       when: resize_needed
 
----
+
+- name: Enable iSCSI kernel modules on Ubuntu workers
+  hosts: ubuntu_workers
+  become: true
+  tasks:
+    - name: Ensure 'open-iscsi' is installed
+      ansible.builtin.apt:
+        name: open-iscsi
+        state: present
+        update_cache: yes
+
+    - name: Load 'iscsi_tcp' module
+      ansible.builtin.modprobe:
+        name: iscsi_tcp
+        state: present
+
+    - name: Ensure 'iscsi_tcp' module loads on boot
+      ansible.builtin.lineinfile:
+        path: /etc/modules
+        line: iscsi_tcp
+
 
 - name: Add inter-node SSH keys
-  hosts: cluster
+  hosts: all_workers
   vars:
     private_key_path: "~/.ssh/clementine.pk"
-    public_key_path:  "~/.ssh/clementine.pub"
+    public_key_path: "~/.ssh/clementine.pub"
   tasks:
     - name: Add public key to authorized keys
       authorized_key:
