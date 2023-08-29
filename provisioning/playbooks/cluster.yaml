@@ -20,13 +20,10 @@
         mode: '0644'
       when: run_ssh_key_gen
 
-- name: Grow root partition
+
+- name: Configure partitions on Kubernetes workers
   hosts: all_workers
   tasks:
-    - name: Update ubuntu apt cache
-      when: "'ubuntu_workers' in group_names"
-      ansible.builtin.apt:
-        update_cache: yes
     - name: Install ubuntu packages
       when: "'ubuntu_workers' in group_names"
       ansible.builtin.apt:
@@ -34,19 +31,18 @@
           - cloud-utils
           - e2fsprogs
         state: present
-    - name: Install reborn packages
-      when: "'reborn_workers' in group_names"
-      pacman:
-        update_cache: yes
-        name:
-          - cloud-utils
-          - e2fsprogs
-        state: present
 
-    - name: Grow NVME partition
+    - name: Resize root partition to 64GB
       community.general.parted:
         device: /dev/nvme0n1
         number: 2
+        part_end: "64GB"
+
+    - name: Grow data partition
+      community.general.parted:
+        device: /dev/nvme0n1
+        number: 3
+        part_start: "64GB"
         part_end: 100%
 
     - name: Get partition size
@@ -71,14 +67,15 @@
 
 
 - name: Enable iSCSI kernel modules on Ubuntu workers
-  hosts: ubuntu_workers
+  hosts: storage_workers
   become: true
   tasks:
     - name: Ensure 'open-iscsi' is installed
       ansible.builtin.apt:
-        name: open-iscsi
-        state: present
         update_cache: yes
+        pkg:
+          - open-iscsi
+        state: present
 
     - name: Load 'iscsi_tcp' module
       ansible.builtin.modprobe:
@@ -90,6 +87,18 @@
         path: /etc/modules
         line: iscsi_tcp
 
+- name: Set HugePages
+  hosts: storage_workers
+  become: yes
+
+  tasks:
+    - name: Set nr_hugepages
+      sysctl:
+        name: vm.nr_hugepages
+        value: '1152'
+        state: present
+        sysctl_set: yes
+        reload: yes
 
 - name: Add inter-node SSH keys
   hosts: all_workers
