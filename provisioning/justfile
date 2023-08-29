@@ -27,6 +27,10 @@ edit-secrets:
 create-cluster:
   env SSH_KNOWN_HOSTS=/dev/null k0sctl apply --config config/k0sctl.yaml
   env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config config/k0sctl.yaml > ~/.kube/config
+  # TODO: fix this - don't start with this bullshit
+  kubectl label nodes aster bernadette storage-provisioner=true
+  kubectl label nodes aster bernadette openebs.io/engine=mayastor
+
 
 reset-cluster:
   env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config config/k0sctl.yaml
