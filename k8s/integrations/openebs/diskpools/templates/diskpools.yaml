@@ -3,7 +3,7 @@ apiVersion: openebs.io/v1alpha1
 kind: DiskPool
 metadata:
   name: datapool-on-{{ .node }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ $.Release.Namespace }}
 spec:
   node: {{ .node }}
   disks: [{{ .disk }}]
