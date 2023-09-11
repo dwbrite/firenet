@@ -1,0 +1,4 @@
+apiVersion: v2
+name: maystor-disk-pools
+description: A Helm chart for mayastor disk pools
+version: 0.1.0

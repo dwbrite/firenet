@@ -1,0 +1,3 @@
+disks:
+  - node: "bernadette"
+    disk: "/dev/nvme0n1p3"

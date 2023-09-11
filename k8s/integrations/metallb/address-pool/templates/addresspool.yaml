@@ -3,7 +3,7 @@ apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: {{ .Values.ipAddressPool.name }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   addresses:
     - {{ .Values.ipAddressPool.addressRange }}
@@ -13,4 +13,4 @@ apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: {{ .Values.l2advertisement.name }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
