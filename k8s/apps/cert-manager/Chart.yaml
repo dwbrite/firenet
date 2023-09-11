@@ -1,6 +1,0 @@
-apiVersion: v2
-name: cert-manager-app-of-apps
-description: App of apps to create cert-manager and some resources
-type: application
-version: 0.1.0
-appVersion: 1.0.0

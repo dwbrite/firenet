@@ -1,3 +1,0 @@
-destNamespace: istio-system
-argoNamespace: argocd
-version: 1.18.2
