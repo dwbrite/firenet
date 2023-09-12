@@ -103,7 +103,7 @@ def main() -> None:
 
     v1 = CoreV1Api()
 
-    service = v1.read_namespaced_service(namespace="default", name="nginx-ingress-controller")
+    service = v1.read_namespaced_service(namespace="istio-system", name="istio-ingress-gateway")
     controller_ip = get_public_ip()
 
     if controller_ip is None:
