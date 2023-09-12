@@ -6,7 +6,7 @@ install-machine: hostname-machine dd cleanup
 devin:
 	sudo adduser dewbrite
 	sudo usermod -aG sudo dewbrite
-	sudo su dwbrite
+	sudo su dewbrite
 	mkdir ~/.ssh
 	chmod 700 ~/.ssh
 	cat ./id_rsa.pub >> ~/.ssh/authorized_keys
