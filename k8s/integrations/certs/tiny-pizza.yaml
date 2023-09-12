@@ -33,6 +33,13 @@ spec:
     istio: ingress-gateway
   servers:
     - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "tiny.pizza"
+        - "*.tiny.pizza"
+    - port:
         number: 443
         name: https
         protocol: HTTPS

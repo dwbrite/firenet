@@ -33,6 +33,13 @@ spec:
     istio: ingress-gateway
   servers:
     - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "dwbrite.com"
+        - "*.dwbrite.com"
+    - port:
         number: 443
         name: https
         protocol: HTTPS
