@@ -2,12 +2,14 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: base-website-main
+  name: vservice-website-rs-main
 spec:
   hosts:
     - "tiny.pizza"
+    - "dwbrite.com"
   gateways:
     - istio-system/dwbrite-com-gateway
+    - istio-system/tiny-pizza-gateway
   http:
     - route:
         - destination:
@@ -20,12 +22,14 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: base-website-media
+  name: vservice-website-rs-media
 spec:
   hosts:
     - "media.tiny.pizza"
+    - "media.dwbrite.com"
   gateways:
     - istio-system/dwbrite-com-gateway
+    - istio-system/tiny-pizza-gateway
   http:
     - route:
         - destination:

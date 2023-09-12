@@ -3,7 +3,7 @@ resource "kubernetes_manifest" "gateways_certs" {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
     metadata = {
-      name = "gateways_certs"
+      name = "gateways-certs"
       namespace = "argocd" # TODO: template me from tf output
     }
     spec = {
