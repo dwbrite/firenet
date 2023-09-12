@@ -1,0 +1,45 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: dwbrite-com
+  namespace: istio-system
+spec:
+  secretName: dwbrite-com-tls
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - 'dwbrite.com'
+    - '*.dwbrite.com'
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: dwbrite-com-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingress-gateway
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - "dwbrite.com"
+        - "*.dwbrite.com"
+      tls:
+        mode: SIMPLE
+        credentialName: dwbrite-com-tls

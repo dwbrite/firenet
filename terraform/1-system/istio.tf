@@ -16,7 +16,7 @@ resource "kubernetes_manifest" "istio_base" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.18.2"
+        targetRevision = "1.19.0"
         chart          = "base"
       }
       destination = {
@@ -42,7 +42,7 @@ resource "kubernetes_manifest" "istio_istiod" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.18.2"
+        targetRevision = "1.19.0"
         chart          = "istiod"
       }
       destination = {
@@ -56,6 +56,33 @@ resource "kubernetes_manifest" "istio_istiod" {
   }
 }
 
+resource "kubernetes_manifest" "istio_ingress_gateway" {
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "istio-ingress-gateway"
+      namespace = "argocd" # TODO: PLEASE STOP HARD-CODING ME D;
+    }
+    spec = {
+      project = "default"
+      source = {
+        repoURL        = "https://istio-release.storage.googleapis.com/charts"
+        targetRevision = "1.19.0"
+        chart          = "gateway"
+      }
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = kubernetes_namespace.istio.metadata[0].name
+      }
+      syncPolicy = {
+        automated = {}
+      }
+    }
+  }
+}
+
+
 resource "kubernetes_manifest" "istio_kiali" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
@@ -68,7 +95,7 @@ resource "kubernetes_manifest" "istio_kiali" {
       project = "default"
       source = {
         repoURL        = "https://kiali.org/helm-charts"
-        targetRevision = "1.72"
+        targetRevision = "1.73"
         chart          = "kiali-server"
       }
       destination = {
