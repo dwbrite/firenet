@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: website-rs-main
+spec:
+  host: website-rs-main
+  subsets:
+    - name: blue
+      labels:
+        app.kubernetes.io/instance: blue
+    - name: green
+      labels:
+        app.kubernetes.io/instance: green
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: website-rs-media
+spec:
+  host: website-rs-media
+  subsets:
+    - name: blue
+      labels:
+        app.kubernetes.io/instance: blue
+    - name: green
+      labels:
+        app.kubernetes.io/instance: green

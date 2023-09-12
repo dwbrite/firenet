@@ -1,0 +1,28 @@
+# kustomization.yaml in overlays/prod
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: Deployment
+      name: website-rs-main
+    patch: |-
+      - op: replace
+        path: /spec/template/metadata/labels/app.kubernetes.io~1instance
+        value: blue
+      - op: replace
+        path: /metadata/name
+        value: blue-website-rs-main
+  - target:
+      kind: Deployment
+      name: website-rs-media
+    patch: |-
+      - op: replace
+        path: /spec/template/metadata/labels/app.kubernetes.io~1instance
+        value: blue
+      - op: replace
+        path: /metadata/name
+        value: blue-website-rs-media

@@ -1,8 +1,0 @@
-apiVersion: builtin
-kind: PrefixSuffixTransformer
-metadata:
-  name: prefix-deployment
-namePrefix: blue-
-objref:
-  kind: Deployment
-  apiVersion: apps/v1

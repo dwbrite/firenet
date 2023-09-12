@@ -1,0 +1,35 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: base-website-main
+spec:
+  hosts:
+    - "tiny.pizza"
+  gateways:
+    - istio-system/dwbrite-com-gateway
+  http:
+    - route:
+        - destination:
+            host: website-rs-main
+            subset: blue
+            port:
+              number: 80
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: base-website-media
+spec:
+  hosts:
+    - "media.tiny.pizza"
+  gateways:
+    - istio-system/dwbrite-com-gateway
+  http:
+    - route:
+        - destination:
+            host: website-rs-media
+            subset: blue
+            port:
+              number: 80
