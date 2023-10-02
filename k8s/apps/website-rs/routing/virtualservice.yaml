@@ -11,11 +11,6 @@ spec:
     - istio-system/dwbrite-com-gateway
     - istio-system/tiny-pizza-gateway
   http:
-    - match:
-        - uri:
-          prefix: "/"
-      redirect:
-        httpsRedirect: true
     - route:
         - destination:
             host: website-rs-main
@@ -36,11 +31,6 @@ spec:
     - istio-system/dwbrite-com-gateway
     - istio-system/tiny-pizza-gateway
   http:
-    - match:
-        - uri:
-          prefix: "/"
-      redirect:
-        httpsRedirect: true
     - route:
         - destination:
             host: website-rs-media
