@@ -7,6 +7,14 @@ resources:
 
 namePrefix: blue-
 
+images:
+  - name: docker.io/dwbrite/dwbrite-com
+    newName: docker.io/dwbrite/dwbrite-com
+    newTag: latest   # Replace with your new tag
+  - name: docker.io/dwbrite/media-dwbrite-com
+    newName: docker.io/dwbrite/media-dwbrite-com
+    newTag: latest   # Replace with your new tag
+
 patches:
   - target:
       kind: Deployment
