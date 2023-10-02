@@ -12,9 +12,9 @@ spec:
     - istio-system/tiny-pizza-gateway
   http:
     - match:
-        - port: 80
-      redirectAction:
-        prefix: "/"
+        - uri:
+          prefix: "/"
+      redirect:
         httpsRedirect: true
     - route:
         - destination:
@@ -37,9 +37,9 @@ spec:
     - istio-system/tiny-pizza-gateway
   http:
     - match:
-        - port: 80
-      redirectAction:
-        prefix: "/"
+        - uri:
+          prefix: "/"
+      redirect:
         httpsRedirect: true
     - route:
         - destination:
