@@ -14,7 +14,7 @@ spec:
     - route:
         - destination:
             host: website-rs-main
-            subset: green
+            subset: blue
             port:
               number: 80
 
@@ -34,6 +34,6 @@ spec:
     - route:
         - destination:
             host: website-rs-media
-            subset: green
+            subset: blue
             port:
               number: 80
