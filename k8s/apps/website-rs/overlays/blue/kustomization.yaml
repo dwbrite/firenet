@@ -10,10 +10,10 @@ namePrefix: blue-
 images:
   - name: docker.io/dwbrite/dwbrite-com
     newName: docker.io/dwbrite/dwbrite-com
-    newTag: latest   # Replace with your new tag
+    newTag: v0.1.0
   - name: docker.io/dwbrite/media-dwbrite-com
     newName: docker.io/dwbrite/media-dwbrite-com
-    newTag: latest   # Replace with your new tag
+    newTag: v0.1.0
 
 patches:
   - target:

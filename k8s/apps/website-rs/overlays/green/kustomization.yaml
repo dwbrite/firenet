@@ -7,7 +7,6 @@ resources:
 
 namePrefix: green-
 
-
 images:
   - name: docker.io/dwbrite/dwbrite-com
     newName: docker.io/dwbrite/dwbrite-com
