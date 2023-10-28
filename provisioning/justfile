@@ -26,10 +26,13 @@ edit-secrets:
 # runs k0sctl commands on operator machine, applying configuration from config.yaml
 create-cluster:
   env SSH_KNOWN_HOSTS=/dev/null k0sctl apply --config config/k0sctl.yaml
-  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config config/k0sctl.yaml > ~/.kube/config
+  {{@}} kubeconfig
   # TODO: fix this - don't start with this bullshit
   kubectl label nodes bernadette storage-capable=true
   kubectl label nodes bernadette openebs.tf.io/engine=mayastor
+
+kubeconfig:
+  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config config/k0sctl.yaml > ~/.kube/config
 
 
 reset-cluster:

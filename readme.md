@@ -73,6 +73,12 @@ as well as ddclient (actually inadyn).
 The nginx.config is updated up to once a minute from a pod running in k8s, 
 and redirects ports based on the ingress controller.
 
+# environment/setup
+
+Setting up a new machine is pretty simple. Ansible needs the .vault_pass file, which is kept elsewhere.
+`just kubeconfig` to grab the kubeconfig from k0sctl.
+
+Terraform needs some env vars set up, too. Idk, go figure that out from the var files.
 
 # TODO:
 
