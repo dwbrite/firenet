@@ -10,7 +10,7 @@ This is my attempt at doing so.
 ## dev-dependencies
 
 - just
-- ansible (pip/netaddr)
+- ansible (pip/netaddr/paramiko)
 - k0sctl (go)
 - terraform
 - helm
@@ -84,3 +84,4 @@ Terraform needs some env vars set up, too. Idk, go figure that out from the var 
 
 - compile config.boot.j2 here, upload to vyos, and run a load command instead of using the vyos_config module, which maintains extraneous state.
 - in config.boot.j2, turn hosts, ports and subdomains into lists instead of named items
+- VPN for LAN access. ns.agency?
