@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yaml
+  - statefulset-postgresql.yaml
+  - statefulset-redis.yaml
+  - service-outline.yaml
+  - service-postgresql.yaml
+  - service-redis.yaml
+  - pvc.yaml
+  - unsecrets.yaml
+  - redis-configmaps.yaml
+  - virtualservice.yaml
