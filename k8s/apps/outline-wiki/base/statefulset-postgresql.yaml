@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: outline-wiki-postgresql
+spec:
+  serviceName: "outline-wiki-postgresql"
+  replicas: 1  # Adjust based on your needs
+  selector:
+    matchLabels:
+      app: outline-wiki-postgresql
+  template:
+    metadata:
+      labels:
+        app: outline-wiki-postgresql
+    spec:
+      initContainers:
+        - name: volume-permissions
+          image: busybox
+          command: [ 'sh', '-c', 'chmod -R 777 /bitnami/postgresql' ]
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /bitnami/postgresql
+      containers:
+        - name: outline-wiki-postgresql
+          image: bitnami/postgresql:16.1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - '-c'
+                - >-
+                  exec pg_isready -U "outline" -d "dbname=outline" -h 127.0.0.1
+                  -p 5432
+          env:
+            - name: BITNAMI_DEBUG
+              value: 'true'
+            - name: POSTGRESQL_PORT_NUMBER
+              value: '5432'
+            - name: POSTGRESQL_VOLUME_DIR
+              value: /bitnami/postgresql
+            - name: PGDATA
+              value: /bitnami/postgresql/data
+            - name: POSTGRES_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgresql-postgres-password
+                  name: outline-wiki-postgresql
+            - name: POSTGRES_USER
+              value: outline
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgresql-password
+                  name: outline-wiki-postgresql
+            - name: POSTGRES_DB
+              value: outline
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: 'no'
+            - name: POSTGRESQL_ENABLE_TLS
+              value: 'no'
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: 'false'
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: 'false'
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: 'false'
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: 'off'
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: error
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: pgaudit
+            - name: POSTGRES_INITDB_ARGS
+              value: "--set huge_pages=off"
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - '-c'
+                - '-e'
+                - >
+                  exec pg_isready -U "outline" -d "dbname=outline" -h 127.0.0.1
+                  -p 5432
+                  
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f
+                  /bitnami/postgresql/.initialized ]
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+            - mountPath: /bitnami/postgresql
+              name: postgres-data
+            - name: postgresql-extended-config
+              mountPath: /bitnami/postgresql/conf/conf.d/
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: dshm
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+        - name: postgresql-extended-config
+          configMap:
+            name: pg-extended-configmap
+  volumeClaimTemplates: []
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-extended-configmap
+  labels:
+    app.kubernetes.io/component: primary
+data:
+  override.conf: |-
+    huge_pages = off

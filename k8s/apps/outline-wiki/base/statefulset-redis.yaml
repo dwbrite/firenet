@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: "outline-wiki-redis-master"
+  replicas: 1  # Adjust based on your needs
+  selector:
+    matchLabels:
+      app: outline-wiki-redis-master
+  template:
+    metadata:
+      labels:
+        app: outline-wiki-redis-master
+    spec:
+      initContainers:
+        - name: volume-permissions
+          image: busybox
+          command: [ 'sh', '-c', 'chmod -R 777 /data' ]
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      containers:
+        - name: outline-wiki-redis-master
+          image: bitnami/redis:6.2.14
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+          args:
+            - '-c'
+            - /opt/bitnami/scripts/start-scripts/start-master.sh
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - '-c'
+                - /health/ping_liveness_local.sh 5
+            failureThreshold: 5
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 6
+          env:
+            - name: BITNAMI_DEBUG
+              value: 'false'
+            - name: REDIS_REPLICATION_MODE
+              value: master
+            - name: ALLOW_EMPTY_PASSWORD
+              value: 'yes'
+            - name: REDIS_TLS_ENABLED
+              value: 'no'
+            - name: REDIS_PORT
+              value: '6379'
+#            - name: REDIS_PASSWORD
+#              value: "bepis"
+          ports:
+            - containerPort: 6379
+              name: redis
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - '-c'
+                - /health/ping_readiness_local.sh 1
+          volumeMounts:
+            - mountPath: /opt/bitnami/scripts/start-scripts
+              name: start-scripts
+            - mountPath: /health
+              name: health
+            - mountPath: /data
+              name: redis-data
+            - mountPath: /opt/bitnami/redis/mounted-etc
+              name: config
+            - mountPath: /opt/bitnami/redis/etc/
+              name: redis-tmp-conf
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - configMap:
+            defaultMode: 493
+            name: outline-wiki-redis-scripts
+          name: start-scripts
+        - configMap:
+            defaultMode: 493
+            name: outline-wiki-redis-health
+          name: health
+        - configMap:
+            defaultMode: 420
+            name: outline-wiki-redis-configuration
+          name: config
+        - emptyDir: { }
+          name: redis-tmp-conf
+        - emptyDir: { }
+          name: tmp
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data
+  volumeClaimTemplates: []
+
+---
+
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: outline-wiki
+    app.kubernetes.io/name: redis
+  name: outline-wiki-redis
+  namespace: outline-wiki
