@@ -15,5 +15,5 @@
       vyos.vyos.vyos_config:
         src: ../config/config.boot.j2
         backup: yes
-        match: exact
+        match: none
         save: true

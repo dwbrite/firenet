@@ -35,10 +35,12 @@ spec:
     - port:
         number: 80
         name: http
-        protocol: HTTP
+        protocol: HTTP2
       hosts:
         - "tiny.pizza"
         - "*.tiny.pizza"
+      tls:
+        httpsRedirect: true
     - port:
         number: 443
         name: https
@@ -49,3 +51,9 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: tiny-pizza-tls
+    - port:
+        number: 9000
+        name: minio_api
+        protocol: HTTP2
+      hosts:
+        - "s3.tiny.pizza"

@@ -28,7 +28,7 @@ firewall {
             }
             destination {
                 address {{ cluster_ip }}
-                port 80,443
+                port 80,443,9000
             }
             protocol tcp
         }
@@ -109,7 +109,7 @@ nat {
         rule 30 {
             description web-server-wan
             destination {
-                port 80,443
+                port 80,443,9000
             }
             inbound-interface eth0
             protocol tcp

@@ -23,6 +23,7 @@ spec:
     group: cert-manager.io
 
 ---
+
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -35,10 +36,13 @@ spec:
     - port:
         number: 80
         name: http
-        protocol: HTTP
+        protocol: HTTP2
       hosts:
         - "dwbrite.com"
         - "*.dwbrite.com"
+      tls:
+        httpsRedirect: true
+
     - port:
         number: 443
         name: https
@@ -46,6 +50,16 @@ spec:
       hosts:
         - "dwbrite.com"
         - "*.dwbrite.com"
+      tls:
+        mode: SIMPLE
+        credentialName: dwbrite-com-tls
+
+    - port:
+        number: 9000
+        name: minio_api
+        protocol: HTTPS
+      hosts:
+        - "s3.dwbrite.com"
       tls:
         mode: SIMPLE
         credentialName: dwbrite-com-tls

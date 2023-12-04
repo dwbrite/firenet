@@ -16,7 +16,7 @@ resource "kubernetes_manifest" "istio_base" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.19.0"
+        targetRevision = "1.20.0"
         chart          = "base"
       }
       destination = {
@@ -42,7 +42,7 @@ resource "kubernetes_manifest" "istio_istiod" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.19.0"
+        targetRevision = "1.20.0"
         chart          = "istiod"
       }
       destination = {
@@ -68,8 +68,31 @@ resource "kubernetes_manifest" "istio_ingress_gateway" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.19.0"
+        targetRevision = "1.20.0"
         chart          = "gateway"
+        helm = {
+          values = <<-EOF
+            service:
+              type: LoadBalancer
+              ports:
+                - name: status-port
+                  port: 15021
+                  protocol: TCP
+                  targetPort: 15021
+                - name: http2
+                  port: 80
+                  protocol: TCP
+                  targetPort: 80
+                - name: https
+                  port: 443
+                  protocol: TCP
+                  targetPort: 443
+                - name: minio-api
+                  port: 9000
+                  protocol: TCP
+                  targetPort: 9000
+          EOF
+        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"
@@ -95,7 +118,7 @@ resource "kubernetes_manifest" "istio_kiali" {
       project = "default"
       source = {
         repoURL        = "https://kiali.org/helm-charts"
-        targetRevision = "1.73"
+        targetRevision = "1.77"
         chart          = "kiali-server"
       }
       destination = {
