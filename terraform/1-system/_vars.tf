@@ -5,7 +5,3 @@ variable "cloudflare-dns-token" {
 variable "email" {
   type    = string
 }
-
-variable "root_domain" {
-  type    = string
-}
