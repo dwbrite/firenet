@@ -44,7 +44,7 @@ resource "kubernetes_manifest" "cosi_controller" {
     spec = {
       project = "default"
       source = {
-        repoURL        = "https://github.com/kubernetes-sigs/container-object-storage-interface-controller"
+        repoURL        = "https://github.com/dwbrite/firenet/k8s/system/cosi-controller/base"
         targetRevision = "HEAD"  # TODO: don't specify at HEAD
         path = "./"
         kustomize      = {}
