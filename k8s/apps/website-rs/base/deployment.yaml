@@ -19,6 +19,11 @@ spec:
         app.kubernetes.io/instance: base
         app.kubernetes.io/component: main
     spec:
+      initContainers:
+        - name: wait-for-istio
+          image: curlimages/curl:latest
+          command: [ 'sh', '-c', 'until curl -fsI http://localhost:15021/healthz/ready; do echo waiting for istio-proxy; sleep 1; done;' ]
+
       containers:
         - name: website-rs-main
           image: "docker.io/dwbrite/dwbrite-com:latest"
