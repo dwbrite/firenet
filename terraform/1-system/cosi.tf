@@ -44,9 +44,9 @@ resource "kubernetes_manifest" "cosi_controller" {
     spec = {
       project = "default"
       source = {
-        repoURL        = "https://github.com/dwbrite/firenet/k8s/system/cosi-controller/base"
+        repoURL        = "https://github.com/dwbrite/firenet"
         targetRevision = "HEAD"  # TODO: don't specify at HEAD
-        path = "./"
+        path = "./k8s/system/cosi-controller/base"
         kustomize      = {}
       }
       destination = {
