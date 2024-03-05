@@ -60,10 +60,10 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
   vyos_user = "vyos"
   domain = "home.arpa"
 
-  proxy_ip = "199.195.252.45"
-
   network_block = "10.11.1.0/24"
   gateway_ip = raw_network.firstAddress.next().toString()
+
+  proxy_ip = "199.195.252.45"
 
   dhcp {
     start = outer.raw_network.firstAddress.add(100).toString()
