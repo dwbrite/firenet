@@ -2,81 +2,95 @@
 # TODO: static IP on tertiary AP / AiMesh Node 1?: 70:85:C2:49:E7:4D
 # TODO: static IP on tertiary AP / AiMesh Node 2?: 4C:ED:FB:48:42:C0
 
-
 firewall {
-    interface eth0 {
-        in {
-            name WAN-IN
+    ipv4 {
+         forward {
+             filter {
+                 default-action accept
+                 rule 5 {
+                     action jump
+                     inbound-interface {
+                         name eth0
+                     }
+                     jump-target WAN-IN
+                 }
+             }
+         }
+         input {
+             filter {
+                 default-action accept
+                 rule 5 {
+                     action jump
+                     inbound-interface {
+                         name eth0
+                     }
+                     jump-target WAN-LOCAL
+                 }
+             }
+         }
+        name WAN-IN {
+            default-action drop
+            rule 10 {
+                action accept
+                state {
+                    established
+                    related
+                }
+            }
+            rule 30 {
+                action accept
+                state {
+                    new
+                }
+                destination {
+                    address {{ cluster.ip }}
+                    port 80,443,9000
+                }
+                protocol tcp
+            }
         }
-        local {
-            name WAN-LOCAL
+        name WAN-LOCAL {
+            default-action drop
+            rule 10 {
+                action accept
+                state {
+                    established
+                    related
+                }
+            }
+            rule 20 {
+                action accept
+                icmp {
+                    type-name echo-request
+                }
+                protocol icmp
+                state {
+                    new
+                }
+            }
+            rule 30 {
+                action drop
+                destination {
+                    port 22
+                }
+                protocol tcp
+                recent {
+                    count 4
+                    time minute
+                }
+                state new
+            }
+            rule 31 {
+                action accept
+                destination {
+                    port 22
+                }
+                protocol tcp
+                state new
+            }
         }
     }
-    name WAN-IN {
-        default-action drop
-        rule 10 {
-            action accept
-            state {
-                established enable
-                related enable
-            }
-        }
-        rule 30 {
-            action accept
-            state {
-                new enable
-            }
-            destination {
-                address {{ cluster.ip }}
-                port 80,443,9000
-            }
-            protocol tcp
-        }
-    }
-    name WAN-LOCAL {
-        default-action drop
-        rule 10 {
-            action accept
-            state {
-                established enable
-                related enable
-            }
-        }
-        rule 20 {
-            action accept
-            icmp {
-                type-name echo-request
-            }
-            protocol icmp
-            state {
-                new enable
-            }
-        }
-        rule 30 {
-            action drop
-            destination {
-                port 22
-            }
-            protocol tcp
-            recent {
-                count 4
-                time minute
-            }
-            state {
-                new enable
-            }
-        }
-        rule 31 {
-            action accept
-            destination {
-                port 22
-            }
-            protocol tcp
-            state {
-                new enable
-            }
-        }
-    }
+
 }
 interfaces {
     ethernet eth0 {
@@ -94,7 +108,6 @@ nat {
     source {
         /*if it's outbound, nat out*/
         rule 100 {
-            outbound-interface any
             source {
                 address {{ network_block }}
             }
@@ -111,10 +124,10 @@ nat {
             destination {
                 port 80,443,9000
             }
-            inbound-interface eth0
+            inbound-interface name eth0
             protocol tcp
             translation {
-                address {{ cluster_ip }}
+                address {{ cluster.ip }}
             }
         }
     }
@@ -124,9 +137,7 @@ protocols {
         arp {
             interface eth1 {
                 {% for machine in cluster.machines %}
-                address {{ machine.addr }} {
-                    mac {{ machine.mac }}
-                }
+                address {{ machine.addr }} mac {{ machine.mac }}
                 {% endfor %}
             }
         }
@@ -136,21 +147,28 @@ service {
     dhcp-server {
         shared-network-name LAN {
             subnet {{ network_block }} {
-                default-router {{ gateway_ip }}
-                domain-name {{ domain }}
+                option {
+                    default-router {{ gateway_ip }}
+                    domain-name {{ domain }}
+                    name-server {{ gateway_ip }}
+                }
                 lease 86400
-                name-server {{ gateway_ip }}
+
+                {% for machine in cluster.machines %}
+
+                static-mapping {{ machine.hostname }} {
+                    ip-address  {{ machine.addr }}
+                    mac {{ machine.mac }}
+                }
+
+                {% endfor %}
+
                 range 0 {
                     start {{ dhcp.start }}
                     stop {{ dhcp.end }}
                 }
 
-                {% for machine in cluster.machines %}
-                static-mapping {{ machine.hostname }} {
-                    ip-address  {{ machine.addr }}
-                    mac-address {{ machine.mac }}
-                }
-                {% endfor %}
+
             }
         }
     }
@@ -168,11 +186,12 @@ service {
                         address {{ proxy_ip }}
                     }
 
-
                     {% for machine in cluster.machines %}
+
                     a {{ machine.hostname }} {
                         address  {{ machine.addr }}
                     }
+
                     {% endfor %}
                 }
             }
@@ -220,9 +239,7 @@ system {
             speed 115200
         }
     }
-    domain-search {
-        domain {{ domain }}
-    }
+    domain-search {{ domain }}
     host-name gateway
     login {
         user vyos {
