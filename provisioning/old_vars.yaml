@@ -20,9 +20,13 @@ aster:
 bernadette:
   addr: "{{ clementine_subnet | ansible.utils.ipaddr('2') | ansible.utils.ipaddr('address') }}"
   mac: "32:2d:6a:8f:02:d3"
-charlie:
+charles:
   addr: "{{ clementine_subnet | ansible.utils.ipaddr('3') | ansible.utils.ipaddr('address') }}"
-  mac: "7a:fc:cc:12:3c:bc"
+  mac: "16:01:5d:12:d1:2e"
+nas:
+  addr: "{{ clementine_subnet | ansible.utils.ipaddr('15') | ansible.utils.ipaddr('address') }}"
+  mac: "04:7c:16:be:3a:e9"
+
 proxy:
   addr: "199.195.252.45"
 

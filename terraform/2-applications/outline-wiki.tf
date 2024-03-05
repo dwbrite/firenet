@@ -50,6 +50,18 @@ resource "kubernetes_secret" "outline_creds" {
   }
 }
 
+resource "kubernetes_secret" "outline_creds" {
+  metadata {
+    name      = "minio-creds"
+    namespace = kubernetes_namespace.outline-wiki.metadata[0].name
+  }
+
+  data = {
+    username = var.keycloak_admin_username
+    password = var.keycloak_admin_password
+  }
+}
+
 // add DEPENDS_ON keycloak
 
 

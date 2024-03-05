@@ -26,25 +26,18 @@ and I will have significantly more capable systems.
 In addition to that, I pay for a very cheap VM from BuyVM to act as a forward proxy/port redirector. 
 
 
-|      alias | role                  | MAC address       |
-|-----------:|-----------------------|:------------------|
-|    gateway | firewall + controller | --                |
-|      proxy | proxy                 | --                |
-|      aster | worker                | c6:f4:bd:8a:f0:7e |
-| bernadette | worker                | 32:2d:6a:8f:02:d3 |
+|      alias | role                | MAC address       |
+|-----------:|---------------------|:------------------|
+|    gateway | firewall            | --                |
+|      proxy | proxy               | --                |
+|      aster | worker              | c6:f4:bd:8a:f0:7e |
+| bernadette | worker              | 32:2d:6a:8f:02:d3 |
+|        nas | controller + worker | 04:7c:16:be:3a:e9 |
 
 
 ## machine configuration
 
 ### workers
-
-To boot from an SSD on the Orange Pi 5s, you need to update the SPI_FLASH bootloader.
-I did this manually with the Orange Pi debian images.
-
-Following that, I installed RebornOS onto an SD card on one of the machines.
-Then I configured ssh and just.
-Unfortunately, RebornOS (now BredOS) doesn't have the iscsi kernel modules available,
-so I was forced to move to Joshua Riek's [ubuntu-rockchip](https://github.com/Joshua-Riek/ubuntu-rockchip) distro.
 
 I brought the preconfigured SD card to each machine, booted them up, 
 logged in via SSH (thanks to that image having a constant mDNS name),
@@ -52,9 +45,7 @@ and ran a justfile that copies the OS over to the NVMe and sets a new hostname.
 
 Further configuration is handled through Ansible.
 
----
-
-Relevant files are in the `./supplements` directory,
+Relevant files are in `./supplements`,
 and can be written directly into the SD card's filesystem or copied to a USB stick.
 
 ### gateway 

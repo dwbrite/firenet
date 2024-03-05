@@ -27,7 +27,7 @@ firewall {
                 new enable
             }
             destination {
-                address {{ cluster_ip }}
+                address {{ cluster.ip }}
                 port 80,443,9000
             }
             protocol tcp
@@ -84,7 +84,7 @@ interfaces {
         description WAN
     }
     ethernet eth1 {
-        address {{ gateway_cidr }}
+        address {{ interface_block }}
         description LAN
     }
     loopback lo {
@@ -96,7 +96,7 @@ nat {
         rule 100 {
             outbound-interface any
             source {
-                address {{ network_cidr }}
+                address {{ network_block }}
             }
             translation {
                 address masquerade
@@ -123,15 +123,11 @@ protocols {
     static {
         arp {
             interface eth1 {
-                address {{ aster.addr }} {
-                    mac {{ aster.mac }}
+                {% for machine in cluster.machines %}
+                address {{ machine.addr }} {
+                    mac {{ machine.mac }}
                 }
-                address {{ bernadette.addr }} {
-                    mac {{ bernadette.mac }}
-                }
-                address {{ charlie.addr }} {
-                    mac {{ charlie.mac }}
-                }
+                {% endfor %}
             }
         }
     }
@@ -139,27 +135,22 @@ protocols {
 service {
     dhcp-server {
         shared-network-name LAN {
-            subnet {{ network_cidr }} {
-                default-router {{ gateway_addr }}
+            subnet {{ network_block }} {
+                default-router {{ gateway_ip }}
                 domain-name {{ domain }}
                 lease 86400
-                name-server {{ gateway_addr }}
+                name-server {{ gateway_ip }}
                 range 0 {
                     start {{ dhcp.start }}
                     stop {{ dhcp.end }}
                 }
-                static-mapping aster {
-                    ip-address  {{ aster.addr }}
-                    mac-address {{ aster.mac }}
+
+                {% for machine in cluster.machines %}
+                static-mapping {{ machine.hostname }} {
+                    ip-address  {{ machine.addr }}
+                    mac-address {{ machine.mac }}
                 }
-                static-mapping bernadette {
-                    ip-address  {{ bernadette.addr }}
-                    mac-address {{ bernadette.mac }}
-                }
-                static-mapping charlie {
-                    ip-address  {{ charlie.addr }}
-                    mac-address {{ charlie.mac }}
-                }
+                {% endfor %}
             }
         }
     }
@@ -167,28 +158,26 @@ service {
         forwarding {
             name-server 9.9.9.9
             name-server 8.8.8.8
-            allow-from {{ network_cidr }}
+            allow-from {{ network_block }}
             authoritative-domain {{ domain }} {
                 records {
                     a gateway {
-                        address {{ gateway_addr }}
+                        address {{ gateway_ip }}
                     }
                     a proxy {
-                        address {{ proxy.addr }}
+                        address {{ proxy_ip }}
                     }
-                    a aster {
-                        address {{ aster.addr }}
+
+
+                    {% for machine in cluster.machines %}
+                    a {{ machine.hostname }} {
+                        address  {{ machine.addr }}
                     }
-                    a bernadette {
-                        address {{ bernadette.addr }}
-                    }
-                    a charlie {
-                        address {{ charlie.addr }}
-                    }
+                    {% endfor %}
                 }
             }
             cache-size 0
-            listen-address {{ gateway_addr }}
+            listen-address {{ gateway_ip }}
         }
     }
     ntp {

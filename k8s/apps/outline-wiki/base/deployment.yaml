@@ -54,17 +54,24 @@ spec:
                 https://keycloak.dwbrite.com/realms/master/protocol/openid-connect/userinfo
             - name: OIDC_USERNAME_CLAIM
               value: preferred_username
-            # A more detailed guide on setting up S3 is available here:
-            # => https://wiki.generaloutline.com/share/125de1cc-9ff6-424b-8415-0d58c809a40f
-            FILE_STORAGE=s3
-            AWS_ACCESS_KEY_ID=get_a_key_from_aws
-            AWS_SECRET_ACCESS_KEY=get_the_secret_of_above_key
-            AWS_REGION=xx-xxxx-x
-            AWS_S3_ACCELERATE_URL=
-            AWS_S3_UPLOAD_BUCKET_URL=http://s3:4569
-            AWS_S3_UPLOAD_BUCKET_NAME=bucket_name_here
-            AWS_S3_FORCE_PATH_STYLE=true
-            AWS_S3_ACL=private
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: minio-bucket-access
+                  key: access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-bucket-access
+                  key: secret_key
+            - name: AWS_S3_UPLOAD_BUCKET_NAME
+              value: "outline"
+            - name: AWS_S3_UPLOAD_BUCKET_URL
+              value: "https://s3.dwbrite.com:9000/outline"
+            - name: AWS_S3_FORCE_PATH_STYLE
+              value: "true"
+            - name: AWS_REGION
+              value: "local"
           ports:
             - containerPort: 3000
               protocol: TCP

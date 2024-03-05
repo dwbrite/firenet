@@ -1,0 +1,109 @@
+import "package://pkg.pkl-lang.org/pkl-pantry/pkl.experimental.net@1.1.0#/net.pkl"
+
+typealias Role = "worker"|"controller"|"controller+worker"
+
+class K0sSSH {
+  address: String
+  user: String
+  keyPath: String
+}
+
+class K0sConfig {
+  role: Role
+  ssh: K0sSSH
+}
+
+class Machine {
+  hostname: String
+  addr: net.IPv4AddressString
+  mac: net.MACAddressString
+  arm = false
+  k0s = new K0sConfig {
+    role = "worker"
+    ssh {
+      address = hostname
+      user = "root"
+      keyPath = "~/.ssh/clementine.pk"
+    }
+  }
+}
+
+class Cluster {
+  hidden fixed raw_subnet: net.IPv4Network = net.IPv4Network(subnet)
+  hidden fixed raw_ip: net.IPv4Address = net.IPv4Address(ip)
+
+  subnet: String
+  ip: net.IPAddressString
+  machines: Listing<Machine>
+}
+
+class DHCP {
+  start:  net.IPv4AddressString
+  end:    net.IPv4AddressString
+}
+
+class NetworkConfig {
+  hidden fixed raw_network: net.IPv4Network = net.IPv4Network(network_block)
+  fixed interface_block: String = gateway_ip + "/24"
+  network_block: String
+  gateway_ip: net.IPv4AddressString
+  dhcp: DHCP
+  domain: String
+  vyos_user: String
+
+  proxy_ip: net.IPv4AddressString
+
+  cluster: Cluster
+}
+
+hidden networkConfig: NetworkConfig = new NetworkConfig {
+  vyos_user = "vyos"
+  domain = "home.arpa"
+
+  proxy_ip = "199.195.252.45"
+
+  network_block = "10.11.1.0/24"
+  gateway_ip = raw_network.firstAddress.next().toString()
+
+  dhcp {
+    start = outer.raw_network.firstAddress.add(100).toString()
+    end = outer.raw_network.firstAddress.add(254).toString() // save x.x.x.255 for the broadcast address
+  }
+
+  cluster {
+    subnet = outer.raw_network.subdivideTo(28)[5].toString()
+    ip = raw_subnet.firstAddress.toString()
+    machines {
+      new Machine {
+        hostname = "aster"
+        addr = cluster.raw_subnet.firstAddress.add(1).toString()
+        mac = "c6:f4:bd:8a:f0:7e"
+        arm = true
+      }
+      new Machine {
+        hostname = "bernadette"
+        addr = cluster.raw_subnet.firstAddress.add(2).toString()
+        mac = "32:2d:6a:8f:02:d3"
+        arm = true
+      }
+      new Machine {
+        hostname = "charles"
+        addr = cluster.raw_subnet.firstAddress.add(3).toString()
+        mac = "16:01:5d:12:d1:2e"
+        arm = true
+      }
+      new Machine {
+        hostname = "nas"
+        addr = cluster.raw_subnet.firstAddress.add(15).toString()
+        mac = "04:7c:16:be:3a:e9"
+        k0s {
+          role = "controller+worker"
+        }
+      }
+    }
+  }
+}
+
+output {
+  value = networkConfig
+}

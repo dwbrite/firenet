@@ -4,7 +4,7 @@
   vars:
     private_key_path: "~/.ssh/clementine.pk"
     public_key_path: "~/.ssh/clementine.pub"
-    run_ssh_key_gen: false
+    run_ssh_key_gen: true
   tasks:
     - name: Generate a new SSH key pair
       openssh_keypair:
@@ -20,85 +20,85 @@
         mode: '0644'
       when: run_ssh_key_gen
 
-
-- name: Configure partitions on Kubernetes workers
-  hosts: all_workers
-  tasks:
-    - name: Install ubuntu packages
-      when: "'ubuntu_workers' in group_names"
-      ansible.builtin.apt:
-        pkg:
-          - cloud-utils
-          - e2fsprogs
-        state: present
-
-    - name: Resize root partition to 64GB
-      community.general.parted:
-        device: /dev/nvme0n1
-        number: 2
-        part_end: "64GB"
-
-    - name: Grow data partition
-      community.general.parted:
-        device: /dev/nvme0n1
-        number: 3
-        part_start: "64GB"
-        part_end: 100%
-
-    - name: Get partition size
-      ansible.builtin.command: "blockdev --getsize64 /dev/nvme0n1p2"
-      register: partition_size
-      changed_when: false
-
-    - name: Get filesystem size
-      ansible.builtin.shell: tune2fs -l /dev/nvme0n1p2 | grep 'Block count:' | awk '{ print $3 * 4096 }'
-      register: filesystem_size
-      changed_when: false
-
-    - name: Check if resize is needed
-      set_fact:
-        resize_needed: "{{ (partition_size.stdout | int) > (filesystem_size.stdout | int) }}"
-
-    - name: Resize filesystem
-      ansible.builtin.command: resize2fs /dev/nvme0n1p2
-      register: resize_output
-      changed_when: "'The filesystem on /dev/nvme0n1p2 is now' in resize_output.stdout"
-      when: resize_needed
-
-
-- name: Enable iSCSI kernel modules on Ubuntu workers
-  hosts: storage_workers
-  become: true
-  tasks:
-    - name: Ensure 'open-iscsi' is installed
-      ansible.builtin.apt:
-        update_cache: yes
-        pkg:
-          - open-iscsi
-        state: present
-
-    - name: Load 'iscsi_tcp' module
-      ansible.builtin.modprobe:
-        name: iscsi_tcp
-        state: present
-
-    - name: Ensure 'iscsi_tcp' module loads on boot
-      ansible.builtin.lineinfile:
-        path: /etc/modules
-        line: iscsi_tcp
-
-- name: Set HugePages
-  hosts: storage_workers
-  become: yes
-
-  tasks:
-    - name: Set nr_hugepages
-      sysctl:
-        name: vm.nr_hugepages
-        value: '1152'
-        state: present
-        sysctl_set: yes
-        reload: yes
+#
+#- name: Configure partitions on Kubernetes workers
+#  hosts: all_workers
+#  tasks:
+#    - name: Install ubuntu packages
+#      when: "'ubuntu_workers' in group_names"
+#      ansible.builtin.apt:
+#        pkg:
+#          - cloud-utils
+#          - e2fsprogs
+#        state: present
+#
+#    - name: Resize root partition to 64GB
+#      community.general.parted:
+#        device: /dev/nvme0n1
+#        number: 2
+#        part_end: "64GB"
+#
+#    - name: Grow data partition
+#      community.general.parted:
+#        device: /dev/nvme0n1
+#        number: 3
+#        part_start: "64GB"
+#        part_end: 100%
+#
+#    - name: Get partition size
+#      ansible.builtin.command: "blockdev --getsize64 /dev/nvme0n1p2"
+#      register: partition_size
+#      changed_when: false
+#
+#    - name: Get filesystem size
+#      ansible.builtin.shell: tune2fs -l /dev/nvme0n1p2 | grep 'Block count:' | awk '{ print $3 * 4096 }'
+#      register: filesystem_size
+#      changed_when: false
+#
+#    - name: Check if resize is needed
+#      set_fact:
+#        resize_needed: "{{ (partition_size.stdout | int) > (filesystem_size.stdout | int) }}"
+#
+#    - name: Resize filesystem
+#      ansible.builtin.command: resize2fs /dev/nvme0n1p2
+#      register: resize_output
+#      changed_when: "'The filesystem on /dev/nvme0n1p2 is now' in resize_output.stdout"
+#      when: resize_needed
+#
+#
+#- name: Enable iSCSI kernel modules on Ubuntu workers
+#  hosts: storage_workers
+#  become: true
+#  tasks:
+#    - name: Ensure 'open-iscsi' is installed
+#      ansible.builtin.apt:
+#        update_cache: yes
+#        pkg:
+#          - open-iscsi
+#        state: present
+#
+#    - name: Load 'iscsi_tcp' module
+#      ansible.builtin.modprobe:
+#        name: iscsi_tcp
+#        state: present
+#
+#    - name: Ensure 'iscsi_tcp' module loads on boot
+#      ansible.builtin.lineinfile:
+#        path: /etc/modules
+#        line: iscsi_tcp
+#
+#- name: Set HugePages
+#  hosts: storage_workers
+#  become: yes
+#
+#  tasks:
+#    - name: Set nr_hugepages
+#      sysctl:
+#        name: vm.nr_hugepages
+#        value: '1152'
+#        state: present
+#        sysctl_set: yes
+#        reload: yes
 
 - name: Add inter-node SSH keys
   hosts: all_workers

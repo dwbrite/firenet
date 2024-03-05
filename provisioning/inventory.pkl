@@ -1,0 +1,57 @@
+import "machines.pkl"
+
+local networkConfig = (machines.networkConfig)
+
+network {
+  hosts {
+    gateway {
+      host_alias = "gateway"
+    }
+  }
+  vars {
+    ansible_connection= "ansible.netcommon.network_cli"
+    ansible_network_os= "vyos.vyos.vyos"
+    ansible_user = "vyos"
+  }
+}
+
+proxies {
+  hosts {
+    proxy {
+      ansible_host = "199.195.252.45"
+    }
+  }
+  vars {
+    ansible_user = "dwbrite"
+    ansible_become = true
+    ansible_become_pass = "{{proxy_password}}"
+  }
+}
+
+all_workers {
+  hosts {
+    for (machine in machines.networkConfig.cluster.machines) {
+      [machine.hostname] {
+        host_alias=machine.hostname
+      }
+    }
+  }
+  vars {
+    ansible_user = "dewbrite"
+    ansible_become = true
+    ansible_become_pass = "{{cluster_password}}"
+  }
+}
+
+
+
+//
+// output {
+//   value = new Dynamic {
+//     network {
+//       gateway {
+//         host_alias = "gateway"
+//       }
+//     }
+//   }
+// }
