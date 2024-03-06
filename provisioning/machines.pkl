@@ -1,4 +1,4 @@
-import "package://pkg.pkl-lang.org/pkl-pantry/pkl.experimental.net@1.1.0#/net.pkl"
+import "@net/net.pkl"
 
 typealias Role = "worker"|"controller"|"controller+worker"
 
@@ -74,22 +74,22 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
     subnet = outer.raw_network.subdivideTo(28)[5].toString()
     ip = raw_subnet.firstAddress.toString()
     machines {
-      new Machine {
-        hostname = "aster"
-        addr = cluster.raw_subnet.firstAddress.add(1).toString()
-        mac = "c6:f4:bd:8a:f0:7e"
-        arm = true
-      }
-      new Machine {
-        hostname = "bernadette"
-        addr = cluster.raw_subnet.firstAddress.add(2).toString()
-        mac = "32:2d:6a:8f:02:d3"
-        arm = true
-      }
+//       new Machine {
+//         hostname = "aster"
+//         addr = cluster.raw_subnet.firstAddress.add(1).toString()
+//         mac = "c6:f4:bd:8a:f0:7e"
+//         arm = true
+//       }
+//       new Machine {
+//         hostname = "bernadette"
+//         addr = cluster.raw_subnet.firstAddress.add(2).toString()
+//         mac = "32:2d:6a:8f:02:d3"
+//         arm = true
+//       }
       new Machine {
         hostname = "charles"
         addr = cluster.raw_subnet.firstAddress.add(3).toString()
-        mac = "16:01:5d:12:d1:2e"
+        mac = "2e:ca:26:38:5d:df"
         arm = true
       }
       new Machine {

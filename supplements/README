@@ -2,3 +2,8 @@ just a make file
 ex:
 
 make MACHINE="bernadette"
+
+---
+
+armbian has an issue with randomized mac addresses. To fix:
+Solution: Right now I'm on Armbian and follow these commands to assign a fixed MAC

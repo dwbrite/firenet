@@ -28,6 +28,18 @@ proxies {
   }
 }
 
+localhost {
+  hosts {
+    localhost {
+      ansible_connection = "local"
+    }
+  }
+  vars {
+    gather_facts = "no"
+    run_ssh_key_gen = false
+  }
+}
+
 all_workers {
   hosts {
     for (machine in machines.networkConfig.cluster.machines) {
@@ -42,16 +54,3 @@ all_workers {
     ansible_become_pass = "{{cluster_password}}"
   }
 }
-
-
-
-//
-// output {
-//   value = new Dynamic {
-//     network {
-//       gateway {
-//         host_alias = "gateway"
-//       }
-//     }
-//   }
-// }
