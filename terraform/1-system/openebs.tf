@@ -6,7 +6,8 @@ resource "kubernetes_namespace" "openebs-system" {
 
 locals {
   nodes_disks = [
-    { node="bernadette", disk="/dev/nvme0n1p3"}
+#     { node="bernadette", disk="/dev/nvme0n1p3"}
+    { node="nas", disk="/dev/"}
   ]
 
   disks_yml = join("", [

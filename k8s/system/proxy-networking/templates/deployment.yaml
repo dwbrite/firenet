@@ -35,14 +35,7 @@ spec:
 
       containers:
         - name: {{ .Values.deploymentName }}
-          image: {{ .Values.image }}
-
-          command: ["/bin/bash", "-c", "pip install -r /scripts/requirements.txt && base64 -d /scripts/update_proxy.py.b64 | python3"]
-
-          volumeMounts:
-            - name: script
-              mountPath: "/scripts"
-              readOnly: true
+          image: dwbrite/proxy-updater
 
           env:
             - name: KUBERNETES_SERVICE_HOST

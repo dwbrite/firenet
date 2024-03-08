@@ -11,6 +11,7 @@ class K0sSSH {
 class K0sConfig {
   role: Role
   ssh: K0sSSH
+  noTaints = false
 }
 
 class Machine {
@@ -74,18 +75,18 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
     subnet = outer.raw_network.subdivideTo(28)[5].toString()
     ip = raw_subnet.firstAddress.toString()
     machines {
-//       new Machine {
-//         hostname = "aster"
-//         addr = cluster.raw_subnet.firstAddress.add(1).toString()
-//         mac = "c6:f4:bd:8a:f0:7e"
-//         arm = true
-//       }
-//       new Machine {
-//         hostname = "bernadette"
-//         addr = cluster.raw_subnet.firstAddress.add(2).toString()
-//         mac = "32:2d:6a:8f:02:d3"
-//         arm = true
-//       }
+      new Machine {
+        hostname = "aster"
+        addr = cluster.raw_subnet.firstAddress.add(1).toString()
+        mac = "fe:b5:89:c4:4f:a7"
+        arm = true
+      }
+      new Machine {
+        hostname = "bert"
+        addr = cluster.raw_subnet.firstAddress.add(2).toString()
+        mac = "f2:0b:1d:89:90:2e"
+        arm = true
+      }
       new Machine {
         hostname = "charles"
         addr = cluster.raw_subnet.firstAddress.add(3).toString()
@@ -98,6 +99,7 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
         mac = "04:7c:16:be:3a:e9"
         k0s {
           role = "controller+worker"
+          noTaints = true
         }
       }
     }

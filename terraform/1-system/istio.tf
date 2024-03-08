@@ -16,7 +16,7 @@ resource "kubernetes_manifest" "istio_base" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.20.0"
+        targetRevision = "1.20.3"
         chart          = "base"
       }
       destination = {
@@ -42,7 +42,7 @@ resource "kubernetes_manifest" "istio_istiod" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.20.0"
+        targetRevision = "1.20.3"
         chart          = "istiod"
       }
       destination = {
@@ -68,7 +68,7 @@ resource "kubernetes_manifest" "istio_ingress_gateway" {
       project = "default"
       source = {
         repoURL        = "https://istio-release.storage.googleapis.com/charts"
-        targetRevision = "1.20.0"
+        targetRevision = "1.20.3"
         chart          = "gateway"
         helm = {
           values = <<-EOF
