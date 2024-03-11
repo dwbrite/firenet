@@ -38,17 +38,17 @@ output {
               provider = "calico"
               kuberouter = null
               calico {
-              local calico_version = "3.27.0"
-              cni {
-                version = calico_version
+                local calico_version = "3.27.0"
+                cni {
+                  version = calico_version
+                }
+                node {
+                  version = calico_version
+                }
+                kubecontrollers {
+                  version = calico_version
+                }
               }
-              node {
-                version = calico_version
-              }
-              kubecontrollers {
-                version = calico_version
-              }
-            }
               kubeProxy {
                 mode = "ipvs"
                 ipvs {

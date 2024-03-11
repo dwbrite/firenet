@@ -14,6 +14,8 @@ class K0sConfig {
   noTaints = false
 }
 
+typealias BootLoader = "grub"|"uboot"
+
 class Machine {
   hostname: String
   addr: net.IPv4AddressString
@@ -26,6 +28,13 @@ class Machine {
       user = "root"
       keyPath = "~/.ssh/clementine.pk"
     }
+  }
+  k8s_labels {
+    "storage-capable=true"
+    "openebs.tf.io/engine=mayastor"
+  }
+  host_vars = new Dynamic {
+    hugepages = "1024"
   }
 }
 
@@ -80,18 +89,27 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
         addr = cluster.raw_subnet.firstAddress.add(1).toString()
         mac = "fe:b5:89:c4:4f:a7"
         arm = true
+        host_vars {
+          bootloader = "uboot"
+        }
       }
       new Machine {
         hostname = "bert"
         addr = cluster.raw_subnet.firstAddress.add(2).toString()
         mac = "f2:0b:1d:89:90:2e"
         arm = true
+        host_vars {
+          bootloader = "uboot"
+        }
       }
       new Machine {
         hostname = "charles"
         addr = cluster.raw_subnet.firstAddress.add(3).toString()
         mac = "2e:ca:26:38:5d:df"
         arm = true
+        host_vars {
+          bootloader = "uboot"
+        }
       }
       new Machine {
         hostname = "nas"
@@ -100,6 +118,9 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
         k0s {
           role = "controller+worker"
           noTaints = true
+        }
+        host_vars {
+          bootloader = "grub"
         }
       }
     }

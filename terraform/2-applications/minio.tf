@@ -44,16 +44,8 @@ resource "kubernetes_manifest" "minio-operator" {
       project = "default"
       source = {
         repoURL        = "https://operator.min.io/"
-        targetRevision = "5.0.10"
+        targetRevision = "5.0.11"
         chart          = "operator"
-        helm = {
-          values = <<-EOT
-            console:
-              env:
-                - name: CONSOLE_PORT
-                  value: 443
-          EOT
-        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"
@@ -84,12 +76,16 @@ resource "kubernetes_manifest" "minio-tenant" {
         helm = {
           values = <<-EOT
             tenant:
-              name: minio
+              name: outline
               pools:
                 - servers: 1
-                  # name: pool-0
+                  name: minio-pool-outline
                   volumesPerServer: 1
-                  size: 8Gi
+                  size: 24Gi
+              buckets:
+                - name: outline-wiki
+                  region: us-east-1 # lol
+                  objectLock: false
               certificate:
                 requestAutoCert: false
           EOT
@@ -165,5 +161,3 @@ resource "kubernetes_manifest" "vservice_s3api" {
     }
   }
 }
-
-

@@ -7,7 +7,7 @@ resource "kubernetes_namespace" "openebs-system" {
 locals {
   nodes_disks = [
 #     { node="bernadette", disk="/dev/nvme0n1p3"}
-    { node="nas", disk="/dev/"}
+    { node="nas", disk="/dev/nvme0n1p4"}
   ]
 
   disks_yml = join("", [
@@ -41,11 +41,9 @@ resource "kubernetes_manifest" "openebs_argocd_application" {
             mayastor: # as much as this looks like a typo...
               mayastor: # I promise it's not.
                 nodeSelector:
-                  kubernetes.io/arch: arm64
                   storage-capable: "true"
 
               nodeSelector:
-                kubernetes.io/arch: arm64
                 storage-capable: "true"
 
               csi:
@@ -53,8 +51,11 @@ resource "kubernetes_manifest" "openebs_argocd_application" {
                   kubeletDir: /var/lib/k0s/kubelet
 
               image:
-                repo: xin3liang
-                tag: develop
+                # screw ARM for mayastor; keep storage on the x86 NAS
+                # repo: xin3liang
+                # tag: develop
+                repo: mayadata
+                tag: release-2.0
               etcd:
                 persistence:
                   enabled: false
@@ -69,7 +70,6 @@ resource "kubernetes_manifest" "openebs_argocd_application" {
                 enabled: false
               io_engine:
                 nodeSelector:
-                  kubernetes.io/arch: arm64
                   storage-capable: "true"
               enabled: true
           EOT

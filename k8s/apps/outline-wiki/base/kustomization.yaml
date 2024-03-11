@@ -8,6 +8,5 @@ resources:
   - service-postgresql.yaml
   - service-redis.yaml
   - pvc.yaml
-  - unsecrets.yaml
   - redis-configmaps.yaml
   - virtualservice.yaml

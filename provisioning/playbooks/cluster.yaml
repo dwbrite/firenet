@@ -19,7 +19,6 @@
         mode: '0644'
       when: run_ssh_key_gen
 
-
 - name: Add inter-node SSH keys
   hosts: all_workers
   vars:
@@ -45,3 +44,53 @@
       service:
         name: sshd
         state: restarted
+
+- name: Configure HugePages and Kubernetes Nodes
+  hosts: all_workers
+  become: yes
+  tasks:
+    - name: Configure sysctl for HugePages (Runtime)
+      ansible.builtin.sysctl:
+        name: vm.nr_hugepages
+        value: "{{hugepages}}"
+        state: present
+        reload: yes
+
+    - name: Ensure HugePages are configured on reboot
+      ansible.builtin.template:
+        src: sysctl_hugepages.conf.j2
+        dest: "/etc/sysctl.d/99-hugepages.conf"
+      when: ansible_os_family == "Debian" or ansible_os_family == "RedHat"
+      notify: Reboot message
+
+  handlers:
+    - name: Reboot message
+      ansible.builtin.debug:
+        msg: "Changes were made. You should consider rebooting after this operation."
+
+
+- name: Enable NVMe Fabrics and NVMe TCP Modules on Kubernetes Nodes
+  hosts: all_workers
+  become: yes
+  tasks:
+    - name: Load nvme-fabrics module (Runtime)
+      ansible.builtin.modprobe:
+        name: nvme-fabrics
+        state: present
+
+    - name: Load nvme-tcp module (Runtime)
+      ansible.builtin.modprobe:
+        name: nvme-tcp
+        state: present
+
+    - name: Ensure nvme-fabrics is loaded on reboot
+      ansible.builtin.lineinfile:
+        path: /etc/modules-load.d/nvme-fabrics.conf
+        line: nvme-fabrics
+        create: yes
+
+    - name: Ensure nvme-tcp is loaded on reboot
+      ansible.builtin.lineinfile:
+        path: /etc/modules-load.d/nvme-tcp.conf
+        line: nvme-tcp
+        create: yes

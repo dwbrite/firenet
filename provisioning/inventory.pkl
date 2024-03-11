@@ -45,6 +45,9 @@ all_workers {
     for (machine in machines.networkConfig.cluster.machines) {
       [machine.hostname] {
         host_alias=machine.hostname
+        for (name, val in machine.host_vars) {
+          [name] = val
+        }
       }
     }
   }

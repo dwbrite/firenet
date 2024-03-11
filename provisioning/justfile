@@ -16,6 +16,7 @@ clean-pickles:
   - rm inventory.yaml
   - rm vars.yaml
   - rm k0sctl.yaml
+  - rm playbooks/labels.yaml
 
 list-inventory: pickle-inventory && clean-pickles
   ansible-inventory -i inventory.yaml --list
@@ -38,15 +39,17 @@ edit-secrets:
   ansible-vault edit secrets.yaml --vault-password-file .vault_pass
 
 # runs k0sctl commands on operator machine, applying configuration from config.yaml
-create-cluster: pickle-k0sctl && clean-pickles
+create-cluster: pickle-k0sctl && apply-labels clean-pickles
   env SSH_KNOWN_HOSTS=/dev/null k0sctl apply --config k0sctl.yaml
   env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config k0sctl.yaml > ~/.kube/config
-#  kubectl label nodes bernadette storage-capable=true
-#  kubectl label nodes bernadette openebs.tf.io/engine=mayastor
+
+
+apply-labels: pickle-inventory pickle-network && clean-pickles
+  pkl eval apply-labels.pkl -f yaml > playbooks/labels.yaml
+  ansible-playbook -i inventory.yaml -l all playbooks/labels.yaml
 
 kubeconfig: pickle-k0sctl && clean-pickles
   env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config k0sctl.yaml > ~/.kube/config
-
 
 reset-cluster: pickle-k0sctl && clean-pickles
   env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config k0sctl.yaml

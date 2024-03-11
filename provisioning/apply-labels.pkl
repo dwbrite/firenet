@@ -1,0 +1,30 @@
+import "machines.pkl"
+
+output {
+  value = new Listing {
+    for (machine in machines.networkConfig.cluster.machines) {
+      new {
+        name = "Label \(machine.hostname)"
+        hosts = "localhost"
+        tasks = new Listing {
+          for (label in machine.k8s_labels) {
+            new {
+              name = "Apply label \(label)"
+              command = "kubectl label nodes \(machine.hostname) \(label) --overwrite"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ---
+// - name: Apply Kubernetes labels to nodes
+//   hosts: localhost
+//   vars_files:
+//     - vars.yml  # Your variable file
+//   tasks:
+//     - name: Label Kubernetes nodes
+//   command: "kubectl label nodes {{ item.hostname }} {{ item.k8s_labels.0 }} --overwrite"
+//   loop: "{{ cluster.machines }}"
