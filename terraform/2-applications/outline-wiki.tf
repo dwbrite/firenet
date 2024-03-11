@@ -137,6 +137,36 @@ resource "kubernetes_manifest" "outline_wiki" {
 }
 
 
+resource "kubernetes_manifest" "vservice_s3api" {
+  manifest = {
+    apiVersion = "networking.istio.io/v1alpha3"
+    kind       = "VirtualService"
+    metadata = {
+      name = "vservice-s3-api"
+      namespace = kubernetes_namespace.s3.metadata[0].name
+    }
+    spec = {
+      hosts = ["s3-outline.tiny.pizza", "s3-outline.dwbrite.com"]
+      gateways = ["istio-system/dwbrite-com-gateway", "istio-system/tiny-pizza-gateway"]
+      http = [
+        {
+          route = [
+            {
+              destination = {
+                host = "outline-hl"
+                port = {
+                  number = 9000
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+
+
 
 resource "kubernetes_manifest" "vservice_outline" {
   manifest = {
