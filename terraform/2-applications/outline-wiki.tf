@@ -88,8 +88,8 @@ resource "kubernetes_secret" "minio-bucket-access" {
   }
 
   data = {
-    access_key = "niPEM6wEA4sNEL5WIths"
-    secret_key = "ncUNAndUiRbcpCNl54AD6DxRQCSbbMyxOGGcYxJU"
+    access_key = "ZCKbjnmJ3fIpd1QcZrPq"
+    secret_key = "uxmWdPC1hGzmSbJjKxdW887iwoa6FNS5gWVAgO3Y"
   }
 }
 
@@ -157,9 +157,9 @@ resource "kubernetes_manifest" "vservice_outline" {
           route = [
             {
               destination = {
-                host = "outline-hl"
+                host = "minio"
                 port = {
-                  number = 9000
+                  number = 80
                 }
               }
             }

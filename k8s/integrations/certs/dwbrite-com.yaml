@@ -55,10 +55,10 @@ spec:
         credentialName: dwbrite-com-tls
     - port:
         number: 9000
-        name: minio_api
-        protocol: HTTPS
+        name: minio
+        protocol: HTTP2
       hosts:
         - "*.dwbrite.com"
-      tls:
-        mode: SIMPLE
-        credentialName: dwbrite-com-tls
+#      tls:
+#        mode: SIMPLE
+#        credentialName: dwbrite-com-tls

@@ -51,9 +51,9 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: tiny-pizza-tls
-    - port:
-        number: 9000
-        name: minio_api
-        protocol: HTTP2
-      hosts:
-        - "*.tiny.pizza"
+#    - port:
+#        number: 9000
+#        name: minio_api
+#        protocol: HTTP2
+#      hosts:
+#        - "*.tiny.pizza"
