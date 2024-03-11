@@ -27,7 +27,50 @@ variable "outline_utils_secret" {
 }
 
 
-# real shit
+# create a minio tenant with a bucket
+
+resource "kubernetes_manifest" "minio-tenant" {
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "minio-tenant"
+      namespace = "argocd" # TODO: PLEASE STOP HARD-CODING ME D;
+    }
+    spec = {
+      project = "default"
+      source = {
+        repoURL        = "https://operator.min.io/"
+        targetRevision = "5.0.10"
+        chart          = "tenant"
+        helm = {
+          values = <<-EOT
+            tenant:
+              name: outline
+              pools:
+                - servers: 1
+                  name: minio-pool-outline
+                  volumesPerServer: 1
+                  size: 24Gi
+              buckets:
+                - name: outline # as described in deployments.yaml
+                  region: local
+                  objectLock: false
+              certificate:
+                requestAutoCert: false
+          EOT
+        }
+      }
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = kubernetes_namespace.s3.metadata[0].name
+      }
+      syncPolicy = {
+        automated = {}
+      }
+    }
+  }
+}
 
 resource "kubernetes_namespace" "outline-wiki" {
   metadata {
@@ -37,30 +80,39 @@ resource "kubernetes_namespace" "outline-wiki" {
     }
   }
 }
+#
+# # todo: determine if this will ruin my life. pretty sure it will.
+# data "kubernetes_secret" "minio_root" {
+#   metadata {
+#     namespace = "s3"
+#     name = "console-sa-secret"
+#   }
+# }
 
-resource "kubernetes_secret" "outline_creds" {
+resource "kubernetes_secret" "minio-bucket-access" {
   metadata {
-    name      = "outline-creds"
+    name      = "minio-bucket-access"
+      namespace = kubernetes_namespace.outline-wiki.metadata[0].name
+  }
+
+  data = {
+    access_key = var.minio_root_user
+    secret_key = var.minio_root_password
+  }
+}
+
+resource "kubernetes_secret" "outline-wiki-postgresql" {
+  metadata {
+    name      = "outline-wiki-postgresql"
     namespace = kubernetes_namespace.outline-wiki.metadata[0].name
   }
 
   data = {
-    username = var.keycloak_admin_username
-    password = var.keycloak_admin_password
+    postgresql-user = var.outline_postgresql_user // hard-coded to outline in the stateful set
+    postgresql-password = var.outline_postgresql_password // TODO: change from cock
+    postgresql-postgres-password = var.outline_postgresql_postgres_password
   }
 }
-
-# resource "kubernetes_secret" "minio_creds" {
-#   metadata {
-#     name      = "minio-creds"
-#     namespace = kubernetes_namespace.outline-wiki.metadata[0].name
-#   }
-#
-#   data = {
-#     username = var.keycloak_admin_username
-#     password = var.keycloak_admin_password
-#   }
-# }
 
 resource "kubernetes_manifest" "outline_wiki" {
   depends_on = [kubernetes_manifest.keycloak] // TODO: add a data source for this??

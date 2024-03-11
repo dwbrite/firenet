@@ -59,49 +59,6 @@ resource "kubernetes_manifest" "minio-operator" {
 }
 
 
-resource "kubernetes_manifest" "minio-tenant" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "minio-tenant"
-      namespace = "argocd" # TODO: PLEASE STOP HARD-CODING ME D;
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = "https://operator.min.io/"
-        targetRevision = "5.0.10"
-        chart          = "tenant"
-        helm = {
-          values = <<-EOT
-            tenant:
-              name: outline
-              pools:
-                - servers: 1
-                  name: minio-pool-outline
-                  volumesPerServer: 1
-                  size: 24Gi
-              buckets:
-                - name: outline-wiki
-                  region: us-east-1 # lol
-                  objectLock: false
-              certificate:
-                requestAutoCert: false
-          EOT
-        }
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = kubernetes_namespace.s3.metadata[0].name
-      }
-      syncPolicy = {
-        automated = {}
-      }
-    }
-  }
-}
-
 
 resource "kubernetes_manifest" "vservice_s3" {
   manifest = {
