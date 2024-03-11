@@ -56,6 +56,29 @@ resource "kubernetes_manifest" "istio_istiod" {
   }
 }
 
+resource "kubernetes_service" "prometheus" {
+  metadata {
+    name      = "prometheus"
+    namespace = "istio-system" # Adjust to match the namespace of your Prometheus deployment
+  }
+
+  spec {
+    type = "ClusterIP"
+
+    selector = {
+      app = "prometheus" # Make sure this matches the labels on your Prometheus pods
+    }
+
+    port {
+      port        = 9090
+      target_port = 9090
+      protocol    = "TCP"
+      name        = "http"
+    }
+  }
+}
+
+
 resource "kubernetes_manifest" "istio_ingress_gateway" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"

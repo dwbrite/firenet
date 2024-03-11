@@ -63,7 +63,7 @@ resource "kubernetes_manifest" "minio-tenant-outline" {
       }
       destination = {
         server    = "https://kubernetes.default.svc"
-        namespace = kubernetes_namespace.s3.metadata[0].name
+        namespace = kubernetes_namespace.outline-wiki.metadata[0].name
       }
       syncPolicy = {
         automated = {}
@@ -157,7 +157,7 @@ resource "kubernetes_manifest" "vservice_outline" {
           route = [
             {
               destination = {
-                host = "outline-hl.s3"
+                host = "outline-hl"
                 port = {
                   number = 9000
                 }

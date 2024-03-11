@@ -56,4 +56,4 @@ spec:
         name: minio_api
         protocol: HTTP2
       hosts:
-        - "s3.tiny.pizza"
+        - "*.tiny.pizza"
