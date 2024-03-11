@@ -59,7 +59,7 @@ resource "kubernetes_manifest" "minio-operator" {
 }
 
 
-
+// TODO: make services for tenants?
 resource "kubernetes_manifest" "vservice_s3" {
   manifest = {
     apiVersion = "networking.istio.io/v1alpha3"
@@ -76,7 +76,7 @@ resource "kubernetes_manifest" "vservice_s3" {
           route = [
             {
               destination = {
-                host = "minio-console"
+                host = "console"
                 port = {
                   number = 9090
                 }
@@ -106,7 +106,7 @@ resource "kubernetes_manifest" "vservice_s3api" {
           route = [
             {
               destination = {
-                host = "minio-hl"
+                host = "minio"
                 port = {
                   number = 9000
                 }

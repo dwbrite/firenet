@@ -29,12 +29,12 @@ variable "outline_utils_secret" {
 
 # create a minio tenant with a bucket
 
-resource "kubernetes_manifest" "minio-tenant" {
+resource "kubernetes_manifest" "minio-tenant-outline" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
     metadata = {
-      name      = "minio-tenant"
+      name      = "minio-tenant-outline"
       namespace = "argocd" # TODO: PLEASE STOP HARD-CODING ME D;
     }
     spec = {
@@ -80,14 +80,6 @@ resource "kubernetes_namespace" "outline-wiki" {
     }
   }
 }
-#
-# # todo: determine if this will ruin my life. pretty sure it will.
-# data "kubernetes_secret" "minio_root" {
-#   metadata {
-#     namespace = "s3"
-#     name = "console-sa-secret"
-#   }
-# }
 
 resource "kubernetes_secret" "minio-bucket-access" {
   metadata {
@@ -96,8 +88,8 @@ resource "kubernetes_secret" "minio-bucket-access" {
   }
 
   data = {
-    access_key = var.minio_root_user
-    secret_key = var.minio_root_password
+    access_key = "niPEM6wEA4sNEL5WIths"
+    secret_key = "ncUNAndUiRbcpCNl54AD6DxRQCSbbMyxOGGcYxJU"
   }
 }
 
