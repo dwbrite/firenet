@@ -9,4 +9,3 @@ resources:
   - service-redis.yaml
   - pvc.yaml
   - redis-configmaps.yaml
-  - virtualservice.yaml
