@@ -10,7 +10,7 @@ namePrefix: green-
 images:
   - name: docker.io/dwbrite/dwbrite-com
     newName: docker.io/dwbrite/dwbrite-com
-    newTag: v0.1.2   # Replace with your new tag
+    newTag: v0.1.4   # Replace with your new tag
   - name: docker.io/dwbrite/media-dwbrite-com
     newName: docker.io/dwbrite/media-dwbrite-com
     newTag: v0.1.0   # Replace with your new tag
