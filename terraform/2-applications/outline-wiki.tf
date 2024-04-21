@@ -26,6 +26,16 @@ variable "outline_utils_secret" {
   type        = string
 }
 
+variable "access_key" {
+  description = "access key for minio"
+  type = string
+}
+
+
+variable "secret_key" {
+  description = "secret key for minio"
+  type = string
+}
 
 # create a minio tenant with a bucket
 
@@ -87,9 +97,11 @@ resource "kubernetes_secret" "minio-bucket-access" {
       namespace = kubernetes_namespace.outline-wiki.metadata[0].name
   }
 
+  // TODO: figure out how to generate this automatically
+  // iykyk ;)
   data = {
-    access_key = "ZCKbjnmJ3fIpd1QcZrPq"
-    secret_key = "uxmWdPC1hGzmSbJjKxdW887iwoa6FNS5gWVAgO3Y"
+    access_key = var.access_key
+    secret_key = var.secret_key
   }
 }
 
