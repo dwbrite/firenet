@@ -1,0 +1,130 @@
+open module dwbrite_com
+extends "package://pkg.pkl-lang.org/pkl-pantry/k8s.contrib.appEnvCluster@1.0.1#/AppEnvCluster.pkl"
+
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/core/v1/Service.pkl"
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/apps/v1/Deployment.pkl"
+
+app = "dwbrite-com"
+
+services {
+  ["core"] = new Service {
+    local component = "core"
+    metadata {
+      name = module.app + "-" + component
+    }
+    spec {
+      ports {
+        new {
+          port = 80
+          targetPort = 41234
+        }
+      }
+      selector {
+        ["app"] = module.app
+        ["component"] = component
+      }
+    }
+  }
+
+  ["media"] = new Service {
+    local component = "media"
+    metadata {
+      name = module.app + "-" + component
+    }
+    spec {
+      ports {
+        new {
+          port = 80
+          targetPort = 41234
+        }
+      }
+      selector {
+        ["app"] = module.app
+        ["component"] = component
+      }
+    }
+  }
+}
+
+deployments {
+  ["core"] = new Deployment {
+    local component = "core"
+    metadata {
+      name = module.app
+      labels {
+        ["app"] = module.app
+        ["instance"] = "base"
+      }
+    }
+    spec {
+      replicas = 1
+      selector {
+        matchLabels = metadata.labels
+      }
+      template {
+        metadata {
+          labels = (metadata.labels) {
+             ["component"] = component
+          }
+        }
+        spec {
+          containers {
+            new {
+              name = module.app + "-" + component
+              image = "docker.io/dwbrite/dwbrite-com:latest"
+              imagePullPolicy = "Always"
+              ports {
+                new {
+                  name = "http"
+                  containerPort = 41234
+                  protocol = "TCP"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ["media"] = new Deployment {
+    local component = "media"
+    metadata {
+      name = module.app
+      labels {
+        ["app"] = module.app
+        ["instance"] = "base"
+      }
+    }
+    spec {
+      replicas = 1
+      selector {
+        matchLabels = metadata.labels
+      }
+      template {
+        metadata {
+          labels = (metadata.labels) {
+            ["component"] = component
+          }
+        }
+        spec {
+          containers {
+            new {
+              name = module.app + "-" + component
+              image = "docker.io/dwbrite/dwbrite-com:latest"
+              imagePullPolicy = "Always"
+              ports {
+                new {
+                  name = "http"
+                  containerPort = 41233
+                  protocol = "TCP"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+}

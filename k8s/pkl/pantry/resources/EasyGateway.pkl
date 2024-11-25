@@ -1,0 +1,111 @@
+import "../../pantry/resources/istio/Gateway.pkl"
+import "../../pantry/resources/cert_manager/Certificate.pkl"
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/K8sObject.pkl"
+
+
+class HelperParams {
+  name: String
+  domain: String
+  with_minio: Boolean = true
+}
+
+hidden params = new HelperParams {}
+
+local simple_tls = new Gateway.ServerTLSSettings {
+  mode = "SIMPLE"
+  credentialName = params.name + "-tls"
+}
+
+cert = new Certificate {
+  metadata {
+    name = params.name
+    namespace = "istio-system"
+  }
+  spec {
+    secretName = simple_tls.credentialName!!
+    duration = "2160h0m0s" // 90 days
+    renewBefore = "360h0m0s" // renew 15 days before
+    privateKey = new Dynamic {
+      algorithm = "RSA"
+      encoding = "PKCS1"
+      size = 2048
+    }
+    usages {
+      "server auth"
+      "client auth"
+    }
+    dnsNames {
+      params.domain
+      "*." + params.domain
+    }
+    issuerRef = new Dynamic {
+      name = "letsencrypt-prod"
+      kind = "ClusterIssuer"
+      group = "cert-manager.io"
+    }
+  }
+}
+
+gateway = new Gateway {
+  metadata {
+    name = params.name + "-gateway"
+    namespace = "istio-system"
+  }
+
+  spec {
+    selector {
+      ["istio"] = "ingress-gateway"
+    }
+    servers {
+      new {
+        port {
+          number = 80
+          name = "http"
+          protocol = "HTTP2"
+        }
+        hosts {
+          params.domain
+          "*." + params.domain
+        }
+        tls {
+          httpsRedirect = true
+        }
+      }
+
+      new {
+        port {
+          number = 443
+          name = "https"
+          protocol = "HTTPS"
+        }
+        hosts {
+          params.domain
+          "*." + params.domain
+        }
+        tls = simple_tls
+      }
+
+      when (params.with_minio) {
+        new {
+          port {
+            number = 9000
+            name = "minio"
+            protocol = "HTTPS"
+          }
+          hosts {
+            "*." + params.domain
+          }
+          tls = simple_tls
+        }
+      }
+    }
+  }
+}
+
+output {
+  renderer = new YamlRenderer {
+    isStream = true
+    converters = (K8sObject.output.renderer as YamlRenderer).converters
+  }
+  value = List(cert, gateway)
+}

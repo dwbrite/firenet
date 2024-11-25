@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.deploymentName }}
+        kubernetesio/arch: amd64
     spec:
       serviceAccountName: {{ .Values.serviceAccountName }}
       containers:

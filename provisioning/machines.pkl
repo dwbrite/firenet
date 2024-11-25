@@ -114,7 +114,7 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
       new Machine {
         hostname = "nas"
         addr = cluster.raw_subnet.firstAddress.add(15).toString()
-        mac = "04:7c:16:be:3a:e9"
+        mac = "32:f4:df:35:cc:02"
         k0s {
           role = "controller+worker"
           noTaints = true

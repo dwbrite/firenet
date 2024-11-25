@@ -26,7 +26,7 @@ output {
       }
 
       k0s {
-        version = "v1.29.2+k0s.0" // optional; remove to get version automatically
+        version = "v1.31.2+k0s.0" // optional; remove to get version automatically
         config {
           apiVersion = "k0s.k0sproject.io/v1beta1"
           kind = "ClusterConfig"
@@ -38,7 +38,7 @@ output {
               provider = "calico"
               kuberouter = null
               calico {
-                local calico_version = "3.27.0"
+                local calico_version = "3.29.1"
                 cni {
                   version = calico_version
                 }

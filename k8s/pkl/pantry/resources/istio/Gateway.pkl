@@ -1,0 +1,62 @@
+open module istio.Gateway
+
+extends "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/K8sResource.pkl"
+
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/apimachinery/pkg/apis/meta/v1/ObjectMeta.pkl"
+
+fixed apiVersion = "networking.istio.io/v1alpha3"
+fixed kind = "Gateway"
+metadata: ObjectMeta?
+spec: GatewaySpec
+
+
+class GatewaySpec {
+  selector: Mapping<String, String>?
+  servers: Listing<Server>?
+}
+
+class Server {
+  port: Port
+  bind: String?
+  hosts: Listing<String>
+  tls: ServerTLSSettings?
+  name: String?
+}
+
+class Port {
+  number: UInt32
+  protocol: String
+  name: String
+}
+
+class ServerTLSSettings {
+  httpsRedirect: Boolean?
+  mode: TLSmode?
+  serverCertificate: String?(this != null || (mode != "MUTUAL" && mode != "SIMPLE"))
+  privateKey: String?(this != null || (mode != "MUTUAL" && mode != "SIMPLE"))
+  caCertificates: String?(this != null || (mode != "MUTUAL" && mode != "SIMPLE"))
+
+  credentialName: String?(serverCertificate == null && privateKey == null)
+
+  subjectAltNames: Listing<String>?
+  verifyCertificateSpki: Listing<String>?
+  verifyCertificateHash: Listing<String>?
+  minProtocolVersion: TLSProtocol?
+  maxProtocolVersion: TLSProtocol?
+  cipherSuites: Listing<String>?
+}
+
+typealias TLSmode =
+  "PASSTHROUGH" |
+  "SIMPLE" |
+  "MUTUAL" |
+  "AUTO_PASSTHROUGH" |
+  "ISTIO_MUTUAL" |
+  "OPTIONAL_MUTUAL"
+
+typealias TLSProtocol =
+  "TLS_AUTO" |
+  "TLSV1_0" |
+  "TLSV1_1" |
+  "TLSV1_2" |
+  "TLSV1_3"

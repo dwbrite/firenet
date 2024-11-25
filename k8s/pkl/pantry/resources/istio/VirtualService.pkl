@@ -1,0 +1,35 @@
+open module istio.VirtualService
+
+extends "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/K8sResource.pkl"
+
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/apimachinery/pkg/apis/meta/v1/ObjectMeta.pkl"
+
+fixed apiVersion = "networking.istio.io/v1alpha3"
+fixed kind = "VirtualService"
+metadata: ObjectMeta
+spec: VirtualServiceSpec
+
+
+class VirtualServiceSpec {
+  hosts: Listing<String>?
+  gateways: Listing<String>?
+  http: Listing<unknown>?
+  tls: Listing<unknown>?
+  tcp: Listing<unknown>?
+  exportTo: Listing<String>?
+}
+
+// I can't be arsed to define 3 hours worth of types
+//
+// class HTTPRoute {
+//
+// }
+//
+// class TLSRoute {
+//
+// }
+//
+// class TCPRoute {
+//
+// }
+

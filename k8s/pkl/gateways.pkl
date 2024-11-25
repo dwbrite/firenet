@@ -1,0 +1,33 @@
+import "helpers/EasyGateway.pkl"
+
+dwbrite_com = new EasyGateway {
+  params {
+    name = "dwbrite-com"
+    domain = "dwbrite.com"
+  }
+}
+
+tiny_pizza = new EasyGateway {
+  params {
+    name = "tiny-pizza"
+    domain = "tiny.pizza"
+  }
+}
+
+subnet_zone = new EasyGateway {
+  params {
+    name = "subnet-zone"
+    domain = "subnet.zone"
+    with_minio = false
+  }
+}
+
+output {
+  files { // for use by argocd
+    ["gateway/dwbrite.com.yaml"] = dwbrite_com.output
+    ["gateway/subnet.zone.yaml"] = subnet_zone.output
+
+    // disabling tiny.pizza for now, as we're not really using it anymore
+    // ["gateway/tiny.pizza.yaml"] = tiny_pizza.output
+  }
+}

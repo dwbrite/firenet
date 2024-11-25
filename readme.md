@@ -30,7 +30,7 @@ In addition to that, I pay for a very cheap VM from BuyVM to act as a forward pr
 |--------:|---------------------|:--------------------|
 | gateway | firewall            | --                  |
 |   proxy | proxy               | --                  |
-|     nas | controller + worker | 04:7c:16:be:3a:e9   |
+|     nas | controller + worker | 32:f4:df:35:cc:02   |
 |   aster | worker              | fe:b5:89:c4:4f:a7   |
 |    bert | worker              | f2:0b:1d:89:90:2e   |
 | charles | worker              | 2e:ca:26:38:5d:df   |

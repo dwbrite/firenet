@@ -1,0 +1,165 @@
+// import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/K8sResource.pkl"
+// import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/core/v1/Service.pkl"
+// import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/core/v1/Namespace.pkl"
+// import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/apps/v1/StatefulSet.pkl"
+// import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/core/v1/PersistentVolumeClaim.pkl"
+//
+// hidden namespace = "default"
+// hidden app = "openhab"
+// hidden openhab_home = "/home/openhab"
+//
+// class PVCTemplate {
+//   name: String
+//   accessModes: Listing<String> = new { "ReadWriteOnce" }
+//   storage: String = "1Gi"
+// }
+//
+//
+//
+//
+// function render(input: PVCTemplate): PersistentVolumeClaim = new {
+//   metadata {
+//     name = input.name
+//   }
+//   spec {
+//     accessModes = input.accessModes
+//     resources {
+//       requests {
+//         ["storage"] = input.storage
+//       }
+//     }
+//   }
+// }
+//
+//
+// resources: Listing<K8sResource> = new {
+//   new Namespace {
+//     metadata {
+//       name = module.namespace
+//     }
+//   }
+//
+//   new Service {
+//     metadata {
+//       name = module.app + "-service"
+//       namespace = module.namespace
+//     }
+//     spec {
+//       ports {
+//         new {
+//           port = 8080
+//           targetPort = 8080
+//           protocol = "TCP"
+//           name = "http"
+//         }
+//       }
+//       selector {
+//         ["app"] = module.app
+//       }
+//     }
+//   }
+//
+//   new StatefulSet {
+//     metadata {
+//       name = module.app
+//       namespace = module.namespace
+//     }
+//     spec {
+//       serviceName = module.app + "-service"
+//       replicas = 1
+//       selector {
+//         matchLabels {
+//           ["app"] = module.app
+//         }
+//       }
+//       template {
+//         metadata {
+//           labels {
+//             ["app"] = module.app
+//           }
+//         }
+//         spec {
+//           initContainers {
+//             new {
+//               name = "openhab-init"
+//               image = "openhab/openhab:4.1.2"
+//               command {
+//                 // if userdata is empty, copy from dist
+//                 "sh" "-c" "[ -z \"$(ls -A /openhab/userdata)\" ] && cp -r /openhab/dist/userdata/* /openhab/userdata/"
+//               }
+//               volumeMounts {
+//                 new {
+//                   name = "openhab-conf"
+//                   mountPath = "/openhab/conf"
+//                 }
+//                 new {
+//                   name = "openhab-data"
+//                   mountPath = "/openhab/userdata"
+//                 }
+//                 new {
+//                   name = "openhab-addons"
+//                   mountPath = "/openhab/addons"
+//                 }
+//               }
+//             }
+//           }
+//           containers {
+//             new {
+//               name = module.app
+//               image = "openhab/openhab:4.1.2" // docker hub
+//               resources {
+//                 requests {
+//                   ["memory"] = "512Mi"
+//                   ["cpu"] = "500m"
+//                 }
+//                 limits {
+//                   ["memory"] = "1Gi"
+//                   ["cpu"] = "1000m"
+//                 }
+//               }
+//               ports {
+//                 new {
+//                   containerPort = 8080
+//                   name = "http"
+//                 }
+//               }
+//               volumeMounts {
+//                 new {
+//                   name = "openhab-conf"
+//                   mountPath = "/openhab/conf"
+//                 }
+//                 new {
+//                   name = "openhab-data"
+//                   mountPath = "/openhab/userdata"
+//                 }
+//                 new {
+//                   name = "openhab-addons"
+//                   mountPath = "/openhab/addons"
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       }
+//       volumeClaimTemplates {
+//         render(new PVCTemplate {
+//           name = "openhab-data"
+//         })
+//         render(new PVCTemplate {
+//           name = "openhab-conf"
+//         })
+//         render(new PVCTemplate {
+//           name = "openhab-addons"
+//         })
+//       }
+//     }
+//   }
+// }
+//
+//
+// output {
+//   value = resources
+//   renderer = (K8sResource.output.renderer as YamlRenderer) {
+//     isStream = true
+//   }
+// }
