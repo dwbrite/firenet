@@ -15,6 +15,7 @@ resource "kubernetes_secret" "cloudflare-dns-token"{
   }
 }
 
+// TODO: fixme, this is never run??
 resource "null_resource" "apply_cert_manager_crds" {
   provisioner "local-exec" {
     command = "kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.12.3/cert-manager.crds.yaml"

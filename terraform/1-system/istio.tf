@@ -59,7 +59,7 @@ resource "kubernetes_manifest" "istio_istiod" {
 resource "kubernetes_service" "prometheus" {
   metadata {
     name      = "prometheus"
-    namespace = "istio-system" # Adjust to match the namespace of your Prometheus deployment
+    namespace = kubernetes_namespace.istio.metadata[0].name
   }
 
   spec {
@@ -114,6 +114,10 @@ resource "kubernetes_manifest" "istio_ingress_gateway" {
                   port: 9000
                   protocol: TCP
                   targetPort: 9000
+                - name: minio-console
+                  port: 9090
+                  protocol: TCP
+                  targetPort: 9090
           EOF
         }
       }

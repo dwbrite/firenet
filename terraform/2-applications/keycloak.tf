@@ -26,7 +26,7 @@ resource "kubernetes_namespace" "keycloak" {
 resource "kubernetes_secret" "keycloak_admin_secret" {
   metadata {
     name      = "keycloak-admin-creds"
-    namespace = "keycloak"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
 
   data = {

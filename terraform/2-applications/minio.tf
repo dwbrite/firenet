@@ -44,7 +44,7 @@ resource "kubernetes_manifest" "minio-operator" {
       project = "default"
       source = {
         repoURL        = "https://operator.min.io/"
-        targetRevision = "5.0.11"
+        targetRevision = "6.0.4"
         chart          = "operator"
       }
       destination = {

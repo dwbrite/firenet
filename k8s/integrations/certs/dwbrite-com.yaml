@@ -62,3 +62,13 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: dwbrite-com-tls
+
+    - port:
+        number: 9090
+        name: minio-console
+        protocol: HTTPS
+      hosts:
+        - "*.dwbrite.com"
+      tls:
+        mode: SIMPLE
+        credentialName: dwbrite-com-tls

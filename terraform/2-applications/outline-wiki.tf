@@ -51,7 +51,7 @@ resource "kubernetes_manifest" "minio-tenant-outline" {
       project = "default"
       source = {
         repoURL        = "https://operator.min.io/"
-        targetRevision = "5.0.10"
+        targetRevision = "6.0.4"
         chart          = "tenant"
         helm = {
           values = <<-EOT
@@ -68,6 +68,8 @@ resource "kubernetes_manifest" "minio-tenant-outline" {
                   objectLock: false
               certificate:
                 requestAutoCert: false
+              environment:
+                MINIO_BROWSER_LOGIN_ANIMATION: 'off'
           EOT
         }
       }
@@ -172,6 +174,23 @@ resource "kubernetes_manifest" "vservice_outline" {
                 host = "minio"
                 port = {
                   number = 80
+                }
+              }
+            }
+          ]
+        },
+        {
+          match = [
+            {
+              port = 9090
+            }
+          ]
+          route = [
+            {
+              destination = {
+                host = "outline-console"
+                port = {
+                  number = 9090
                 }
               }
             }
