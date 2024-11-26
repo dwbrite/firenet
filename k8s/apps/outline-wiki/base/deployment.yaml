@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: outline
-          image: outlinewiki/outline:0.72.2
+          image: outlinewiki/outline:0.78.0
           env:
             - name: SECRET_KEY
               value: 5974e36f82085f057223565ac2d0d01427a90248ade611108b4b937672649bd4
