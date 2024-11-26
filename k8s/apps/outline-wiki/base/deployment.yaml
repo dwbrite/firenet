@@ -67,7 +67,7 @@ spec:
             - name: AWS_S3_UPLOAD_BUCKET_NAME
               value: "outline"
             - name: AWS_S3_UPLOAD_BUCKET_URL
-              value: "https://outline.dwbrite.com:9000/outline"
+              value: "https://outline.dwbrite.com:9000"
             - name: AWS_S3_FORCE_PATH_STYLE
               value: "true"
             - name: AWS_REGION
