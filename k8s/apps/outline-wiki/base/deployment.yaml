@@ -41,7 +41,7 @@ spec:
             - name: OIDC_CLIENT_ID
               value: 'outline-wiki'
             - name: OIDC_CLIENT_SECRET
-              value: 'IRVUr6j0k6p8FVlXz966JVDQOlX2XuJ9'
+              value: 'eR70FVTZxroXCn7im7td7DJVhs8kFdnn'
             - name: OIDC_DISPLAY_NAME
               value: 'Login with Keycloak'
             - name: OIDC_SCOPES
