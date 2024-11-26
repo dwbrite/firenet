@@ -63,7 +63,7 @@ resource "kubernetes_manifest" "minio-tenant-outline" {
                   volumesPerServer: 1
                   size: 24Gi
               buckets:
-                - name: outline # as described in deployments.yaml
+                - name: outline-data # as described in deployments.yaml
                   region: local
                   objectLock: false
               certificate:

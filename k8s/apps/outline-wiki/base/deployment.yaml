@@ -65,9 +65,9 @@ spec:
                   name: minio-bucket-access
                   key: secret_key
             - name: AWS_S3_UPLOAD_BUCKET_NAME
-              value: "outline"
+              value: "outline-data"
             - name: AWS_S3_UPLOAD_BUCKET_URL
-              value: "https://outline.dwbrite.com:9000"
+              value: "https://outline.dwbrite.com:9000/outline-data"
             - name: AWS_S3_FORCE_PATH_STYLE
               value: "true"
             - name: AWS_REGION
