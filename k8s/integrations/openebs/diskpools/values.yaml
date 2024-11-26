@@ -1,3 +1,7 @@
 disks:
-  - node: "bernadette"
+  - node: "aster"
+    disk: "/dev/nvme0n1p3"
+  - node: "bert"
+    disk: "/dev/nvme0n1p3"
+  - node: "charles"
     disk: "/dev/nvme0n1p3"

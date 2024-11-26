@@ -51,11 +51,10 @@ resource "kubernetes_manifest" "openebs_argocd_application" {
                   kubeletDir: /var/lib/k0s/kubelet
 
               image:
-                # screw ARM for mayastor; keep storage on the x86 NAS
-                # repo: xin3liang
-                # tag: develop
-                repo: mayadata
-                tag: release-2.0
+                repo: xin3liang
+                tag: develop
+                # repo: mayadata
+                # tag: release-2.0
               etcd:
                 persistence:
                   enabled: false
