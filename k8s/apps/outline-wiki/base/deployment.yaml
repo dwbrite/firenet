@@ -70,6 +70,8 @@ spec:
               value: "https://outline.dwbrite.com:9000/outline"
             - name: AWS_S3_FORCE_PATH_STYLE
               value: "false"
+            - name: AWS_REGION
+              value: "local"
           ports:
             - containerPort: 3000
               protocol: TCP
