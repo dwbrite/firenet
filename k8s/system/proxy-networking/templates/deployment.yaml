@@ -13,8 +13,9 @@ spec:
     metadata:
       labels:
         app: {{ .Values.deploymentName }}
-        kubernetesio/arch: amd64
     spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
       serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
         - name: {{ .Values.deploymentName }}
