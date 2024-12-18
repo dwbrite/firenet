@@ -77,4 +77,10 @@ spec:
         name: tcp-games
         protocol: TCP
       hosts:
-        - "*.dwbrite.com"
+        - "minecraft.dwbrite.com"
+    - port:
+        number: 25565
+        name: tcp-games
+        protocol: TCP
+      hosts:
+        - "mcydb.dwbrite.com"

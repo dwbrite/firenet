@@ -118,6 +118,14 @@ resource "kubernetes_manifest" "istio_ingress_gateway" {
                   port: 9090
                   protocol: TCP
                   targetPort: 9090
+                - name: minecraft
+                  port: 1337
+                  protocol: TCP
+                  targetPort: 1337
+                - name: mcydb
+                  port: 25565
+                  protocol: TCP
+                  targetPort: 25565
           EOF
         }
       }
