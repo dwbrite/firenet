@@ -54,7 +54,7 @@ firewall {
                     new
                 }
                 destination {
-                    address {{ cluster.ip }}
+                    address 10.11.1.138
                     port 8211
                 }
                 protocol tcp
@@ -65,7 +65,7 @@ firewall {
                     new
                 }
                 destination {
-                    address {{ cluster.ip }}
+                    address 10.11.1.138
                     port 8211
                 }
                 protocol udp
@@ -160,7 +160,7 @@ nat {
             inbound-interface name eth0
             protocol tcp
             translation {
-                address {{ cluster.ip }}
+                address 10.11.1.138
             }
         }
         rule 40 {
@@ -171,7 +171,7 @@ nat {
             inbound-interface name eth0
             protocol udp
             translation {
-                address {{ cluster.ip }}
+                address 10.11.1.138
             }
         }
     }
