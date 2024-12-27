@@ -20,6 +20,21 @@ resource "kubernetes_namespace" "keycloak" {
   }
 }
 
+resource "kubernetes_persistent_volume_claim" "keycloak_theme_pvc" {
+  metadata {
+    name      = "keycloak-theme-pvc"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    resources {
+      requests = {
+        storage = "1Gi"
+      }
+    }
+  }
+}
 
 # real shit
 
@@ -47,7 +62,7 @@ resource "kubernetes_manifest" "keycloak" {
       project = "default"
       source = {
         repoURL        = "https://charts.bitnami.com/bitnami"
-        targetRevision = "17.3.1"
+        targetRevision = "17.3.6"
         chart          = "keycloak"
         helm           = {
           values = <<-EOT
@@ -58,6 +73,9 @@ resource "kubernetes_manifest" "keycloak" {
               existingSecret: "${kubernetes_secret.keycloak_admin_secret.metadata[0].name}"
               passwordSecretKey: "password"
             postgresql:
+              auth:
+                postgresPassword: "bepis"
+                password: "boopis"
               image:
                 debug: true
               primary:
@@ -65,6 +83,15 @@ resource "kubernetes_manifest" "keycloak" {
                   huge_pages = off
                 initdb:
                   args: "--set huge_pages=off"
+
+            extraVolumes:
+              - name: keycloak-theme-data
+                persistentVolumeClaim:
+                  claimName: keycloak-theme-pvc
+
+            extraVolumeMounts:
+              - name: keycloak-theme-data
+                mountPath: /opt/bitnami/keycloak/providers
           EOT
         }
       }

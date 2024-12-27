@@ -44,9 +44,31 @@ firewall {
                 }
                 destination {
                     address {{ cluster.ip }}
-                    port 80,443,9000,1337,25565,8211
+                    port 80,443,9000,1337,25565
                 }
                 protocol tcp
+            }
+            rule 31 {
+                action accept
+                state {
+                    new
+                }
+                destination {
+                    address {{ cluster.ip }}
+                    port 8211
+                }
+                protocol tcp
+            }
+            rule 40 {
+                action accept
+                state {
+                    new
+                }
+                destination {
+                    address {{ cluster.ip }}
+                    port 8211
+                }
+                protocol udp
             }
         }
         name WAN-LOCAL {
@@ -122,10 +144,32 @@ nat {
         rule 30 {
             description web-server-wan
             destination {
-                port 80,443,9000,1337,25565,8211
+                port 80,443,9000,1337,25565
             }
             inbound-interface name eth0
             protocol tcp
+            translation {
+                address {{ cluster.ip }}
+            }
+        }
+        rule 31 {
+            description web-server-wan
+            destination {
+                port 8211
+            }
+            inbound-interface name eth0
+            protocol tcp
+            translation {
+                address {{ cluster.ip }}
+            }
+        }
+        rule 40 {
+            description web-server-wan
+            destination {
+                port 8211
+            }
+            inbound-interface name eth0
+            protocol udp
             translation {
                 address {{ cluster.ip }}
             }
