@@ -126,6 +126,10 @@ resource "kubernetes_manifest" "istio_ingress_gateway" {
                   port: 25565
                   protocol: TCP
                   targetPort: 25565
+                - name: pals
+                  port: 8211
+                  protocol: TCP
+                  targetPort: 8211
           EOF
         }
       }

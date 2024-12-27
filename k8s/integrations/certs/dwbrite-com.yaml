@@ -84,3 +84,9 @@ spec:
         protocol: TCP
       hosts:
         - "mcydb.dwbrite.com"
+    - port:
+        number: 8211
+        name: pals
+        protocol: TCP
+      hosts:
+        - "pals.dwbrite.com"
