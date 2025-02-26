@@ -93,15 +93,15 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
           bootloader = "uboot"
         }
       }
-      new Machine {
-        hostname = "bert"
-        addr = cluster.raw_subnet.firstAddress.add(2).toString()
-        mac = "f2:0b:1d:89:90:2e"
-        arm = true
-        host_vars {
-          bootloader = "uboot"
-        }
-      }
+//       new Machine {
+//         hostname = "bert"
+//         addr = cluster.raw_subnet.firstAddress.add(2).toString()
+//         mac = "f2:0b:1d:89:90:2e"
+//         arm = true
+//         host_vars {
+//           bootloader = "uboot"
+//         }
+//       }
       new Machine {
         hostname = "charles"
         addr = cluster.raw_subnet.firstAddress.add(3).toString()
@@ -109,6 +109,17 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
         arm = true
         host_vars {
           bootloader = "uboot"
+        }
+      }
+      new Machine {
+        hostname = "novo"
+        addr = cluster.raw_subnet.firstAddress.add(14).toString()
+        mac = "92:f0:d3:10:f2:36"
+        k0s {
+          role = "controller"
+        }
+        host_vars {
+          bootloader = "grub"
         }
       }
       new Machine {

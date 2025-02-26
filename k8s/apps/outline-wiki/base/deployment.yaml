@@ -40,8 +40,9 @@ spec:
                 https://keycloak.dwbrite.com/realms/master/protocol/openid-connect/auth
             - name: OIDC_CLIENT_ID
               value: 'outline-wiki'
+              # TODO: move this to a secret
             - name: OIDC_CLIENT_SECRET
-              value: 'AijroobOHjvxjDfolAtzuIJN0Zb2yxS5'
+              value: 'YVX1lvkOgaGDMD57kSUx4wgjJoS4VqRf'
             - name: OIDC_DISPLAY_NAME
               value: 'Login with Keycloak'
             - name: OIDC_SCOPES

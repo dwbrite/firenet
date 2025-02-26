@@ -55,7 +55,7 @@ firewall {
                 }
                 destination {
                     address 10.11.1.138
-                    port 8211
+                    port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
                 }
                 protocol tcp
             }
@@ -66,11 +66,12 @@ firewall {
                 }
                 destination {
                     address 10.11.1.138
-                    port 8211
+                    port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
                 }
                 protocol udp
             }
         }
+
         name WAN-LOCAL {
             default-action drop
             rule 10 {
@@ -79,6 +80,10 @@ firewall {
                     established
                     related
                 }
+            }
+            rule 11 {
+                action accept
+                state new
             }
             rule 20 {
                 action accept
@@ -155,7 +160,7 @@ nat {
         rule 31 {
             description web-server-wan
             destination {
-                port 8211
+                port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
             }
             inbound-interface name eth0
             protocol tcp
@@ -166,7 +171,7 @@ nat {
         rule 40 {
             description web-server-wan
             destination {
-                port 8211
+                port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
             }
             inbound-interface name eth0
             protocol udp
