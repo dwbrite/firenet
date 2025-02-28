@@ -1,0 +1,56 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gametank-games
+  namespace: istio-system
+spec:
+  secretName: gametank-games-tls
+  duration: 2160h0m0s # 90 days
+  renewBefore: 360h0m0s # 15 days
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - 'gametank.games'
+    - '*.gametank.games'
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: gametank-games-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingress-gateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP2
+      hosts:
+        - "gametank.games"
+        - "*.gametank.games"
+      tls:
+        httpsRedirect: true
+
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - "gametank.games"
+        - "*.gametank.games"
+      tls:
+        mode: SIMPLE
+        credentialName: gametank-games-tls
+

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: gametank-games
+    app.kubernetes.io/name: gametank-games-postgresql
+  name: gametank-games-postgresql
+spec:
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    app: gametank-games-postgresql
+  type: ClusterIP
