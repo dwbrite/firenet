@@ -25,7 +25,7 @@ spec:
             - name: KUBERNETES_SERVICE_HOST
               value: "kubernetes.default.svc"
             - name: KUBERNETES_SERVICE_PORT
-              value: "6443"
+              value: "16443"
             - name: SECRET_NAME
               value: {{ .Values.secretName }}
             - name: SECRET_NAMESPACE
