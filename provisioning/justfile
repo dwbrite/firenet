@@ -39,17 +39,19 @@ edit-secrets:
   ansible-vault edit secrets.yaml --vault-password-file .vault_pass
 
 # runs k0sctl commands on operator machine, applying configuration from config.yaml
-create-cluster: pickle-k0sctl && apply-labels clean-pickles
-  env SSH_KNOWN_HOSTS=/dev/null k0sctl apply --config k0sctl.yaml
-  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config k0sctl.yaml > ~/.kube/config
+create-cluster: pickle-inventory && kubeconfig apply-labels clean-pickles
+  ansible-playbook -i inventory.yaml -l all_workers playbooks/microk8s.yaml --vault-password-file .vault_pass  --extra-vars '@secrets.yaml'
+
+kubeconfig: pickle-inventory && clean-pickles
+  ansible-playbook -i inventory.yaml -l all_workers,localhost playbooks/kubeconfig.yaml --vault-password-file .vault_pass  --extra-vars '@secrets.yaml'
 
 
 apply-labels: pickle-inventory pickle-network && clean-pickles
   pkl eval apply-labels.pkl -f yaml > playbooks/labels.yaml
   ansible-playbook -i inventory.yaml -l all playbooks/labels.yaml
 
-kubeconfig: pickle-k0sctl && clean-pickles
-  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config k0sctl.yaml > ~/.kube/config
+#kubeconfig: pickle-k0sctl && clean-pickles
+#  env SSH_KNOWN_HOSTS=/dev/null k0sctl kubeconfig --config k0sctl.yaml > ~/.kube/config
 
 reset-cluster: pickle-k0sctl && clean-pickles
   env SSH_KNOWN_HOSTS=/dev/null k0sctl reset --config k0sctl.yaml

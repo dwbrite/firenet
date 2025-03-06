@@ -1,0 +1,93 @@
+---
+- name: Install MicroK8s on all worker nodes
+  hosts: all_workers
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Ensure snapd is installed (if needed)
+      package:
+        name: snapd
+        state: present
+
+    - name: Install snapd through snap (lol)
+      command: snap install snapd
+      args:
+        creates: /snap/bin/snapd
+
+    - name: Restart snapd service
+      systemd:
+        name: snapd
+        state: restarted
+        enabled: yes
+
+    - name: Install MicroK8s
+      command: sudo snap install microk8s --classic
+      args:
+        creates: /snap/bin/microk8s
+
+    - name: Ensure microk8s is in the PATH
+      shell: |
+        ln -sf /snap/bin/microk8s /usr/bin/microk8s
+      args:
+        creates: /usr/bin/microk8s
+
+    - name: Wait for MicroK8s to be ready
+      shell: |
+        microk8s status --wait-ready
+      args:
+        chdir: /home/{{ ansible_user }}
+      register: microk8s_status
+      retries: 5
+      delay: 10
+      until: microk8s_status.rc == 0
+
+    - name: Add current user to microk8s group
+      user:
+        name: "{{ ansible_user }}"
+        groups: "microk8s"
+        append: yes
+      # Reload the user groups without a logout/login
+      notify:
+        - Refresh group membership
+  handlers:
+    - name: Refresh group membership
+      command: newgrp microk8s
+
+- name: Initialize cluster on the first node
+  hosts: novo
+  become: yes
+  tasks:
+    - name: Generate join token
+      shell: microk8s add-node --format yaml
+      register: addnode_output
+
+    - name: Set fact with join command
+      set_fact:
+        microk8s_join_cmd: "{{ addnode_output.stdout | from_yaml | json_query('join_command') }}"
+
+- name: Get join command from the control node
+  hosts: novo
+  become: yes
+  tasks:
+    - name: Generate MicroK8s join command
+      command: microk8s add-node --token-ttl 3600 --format short
+      register: join_cmd
+
+    - name: Set join command as a fact
+      set_fact:
+        microk8s_join_cmd: "{{ join_cmd.stdout }}"
+
+- name: Join cluster on the other nodes
+  hosts: all_workers:!novo
+  become: yes
+  tasks:
+    - name: Debug join command
+      debug:
+        var: hostvars['novo'].microk8s_join_cmd
+
+    - name: Join MicroK8s cluster
+      shell: "{{ hostvars['novo'].microk8s_join_cmd }}"
+      args:
+        chdir: /home/{{ ansible_user }}
+      when: hostvars['novo'].microk8s_join_cmd is defined and hostvars['novo'].microk8s_join_cmd | length > 0
+

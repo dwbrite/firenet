@@ -48,28 +48,6 @@ firewall {
                 }
                 protocol tcp
             }
-            rule 31 {
-                action accept
-                state {
-                    new
-                }
-                destination {
-                    address 10.11.1.138
-                    port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
-                }
-                protocol tcp
-            }
-            rule 40 {
-                action accept
-                state {
-                    new
-                }
-                destination {
-                    address 10.11.1.138
-                    port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
-                }
-                protocol udp
-            }
         }
 
         name WAN-LOCAL {
@@ -155,28 +133,6 @@ nat {
             protocol tcp
             translation {
                 address {{ cluster.ip }}
-            }
-        }
-        rule 31 {
-            description web-server-wan
-            destination {
-                port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
-            }
-            inbound-interface name eth0
-            protocol tcp
-            translation {
-                address 10.11.1.138
-            }
-        }
-        rule 40 {
-            description web-server-wan
-            destination {
-                port 88,500,3074,3544,4500,8211,27015,27031-27036,51999-61000,61002-65535
-            }
-            inbound-interface name eth0
-            protocol udp
-            translation {
-                address 10.11.1.138
             }
         }
     }

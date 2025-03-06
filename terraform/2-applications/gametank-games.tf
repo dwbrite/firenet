@@ -38,6 +38,19 @@ resource "kubernetes_secret" "gametank-games-postgresql" {
   }
 }
 
+resource "kubernetes_secret" "keycloak_admin_secret" {
+  metadata {
+    name      = "keycloak-admin-creds"
+    namespace = kubernetes_namespace.gametank-games.metadata[0].name
+  }
+
+  data = {
+    username = var.keycloak_admin_username
+    password = var.keycloak_admin_password
+  }
+}
+
+
 resource "kubernetes_manifest" "gametank_games" {
   depends_on = [kubernetes_manifest.keycloak] // TODO: add a data source for this??
   manifest = {

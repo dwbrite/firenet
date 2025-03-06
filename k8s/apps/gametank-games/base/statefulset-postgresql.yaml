@@ -91,16 +91,16 @@ spec:
             - mountPath: /dev/shm
               name: dshm
             - mountPath: /bitnami/postgresql
-              name: postgres-data
+              name: gtg-postgres-data
             - name: postgresql-extended-config
               mountPath: /bitnami/postgresql/conf/conf.d/
       volumes:
         - emptyDir:
             medium: Memory
           name: dshm
-        - name: postgres-data
+        - name: gtg-postgres-data
           persistentVolumeClaim:
-            claimName: postgres-data
+            claimName: gtg-postgres-data
         - name: postgresql-extended-config
           configMap:
             name: pg-extended-configmap

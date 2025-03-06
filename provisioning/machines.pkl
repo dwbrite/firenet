@@ -84,56 +84,53 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
     subnet = outer.raw_network.subdivideTo(28)[5].toString()
     ip = raw_subnet.firstAddress.toString()
     machines {
-      new Machine {
-        hostname = "aster"
-        addr = cluster.raw_subnet.firstAddress.add(1).toString()
-        mac = "fe:b5:89:c4:4f:a7"
-        arm = true
-        host_vars {
-          bootloader = "uboot"
-        }
-      }
 //       new Machine {
-//         hostname = "bert"
-//         addr = cluster.raw_subnet.firstAddress.add(2).toString()
-//         mac = "f2:0b:1d:89:90:2e"
+//         hostname = "aster"
+//         addr = cluster.raw_subnet.firstAddress.add(1).toString()
+//         mac = "fe:b5:89:c4:4f:a7"
 //         arm = true
 //         host_vars {
 //           bootloader = "uboot"
 //         }
 //       }
       new Machine {
-        hostname = "charles"
-        addr = cluster.raw_subnet.firstAddress.add(3).toString()
-        mac = "2e:ca:26:38:5d:df"
+        hostname = "bert"
+        addr = cluster.raw_subnet.firstAddress.add(2).toString()
+        mac = "f2:0b:1d:89:90:2f"
         arm = true
         host_vars {
           bootloader = "uboot"
         }
       }
+//       new Machine {
+//         hostname = "charles"
+//         addr = cluster.raw_subnet.firstAddress.add(3).toString()
+//         mac = "2e:ca:26:38:5d:df"
+//         arm = true
+//         host_vars {
+//           bootloader = "uboot"
+//         }
+//       }
       new Machine {
         hostname = "novo"
         addr = cluster.raw_subnet.firstAddress.add(14).toString()
-        mac = "92:f0:d3:10:f2:36"
-        k0s {
-          role = "controller"
-        }
+        mac = "a4:fc:77:3a:e5:75"
         host_vars {
           bootloader = "grub"
         }
       }
-      new Machine {
-        hostname = "nas"
-        addr = cluster.raw_subnet.firstAddress.add(15).toString()
-        mac = "32:f4:df:35:cc:02"
-        k0s {
-          role = "controller+worker"
-          noTaints = true
-        }
-        host_vars {
-          bootloader = "grub"
-        }
-      }
+//       new Machine {
+//         hostname = "nas"
+//         addr = cluster.raw_subnet.firstAddress.add(15).toString()
+//         mac = "32:f4:df:35:cc:02"
+//         k0s {
+//           role = "controller+worker"
+//           noTaints = true
+//         }
+//         host_vars {
+//           bootloader = "grub"
+//         }
+//       }
     }
   }
 }
