@@ -18,7 +18,7 @@ spec:
           image: busybox
           command: [ 'sh', '-c', 'chmod -R 777 /bitnami/postgresql' ]
           volumeMounts:
-            - name: postgres-data
+            - name: gtg-postgres-data
               mountPath: /bitnami/postgresql
       containers:
         - name: gametank-games-postgresql
