@@ -38,7 +38,7 @@ resource "kubernetes_secret" "gametank-games-postgresql" {
   }
 }
 
-resource "kubernetes_secret" "keycloak_admin_secret" {
+resource "kubernetes_secret" "keycloak_admin_creds_gametank_games" {
   metadata {
     name      = "keycloak-admin-creds"
     namespace = kubernetes_namespace.gametank-games.metadata[0].name

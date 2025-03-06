@@ -18,7 +18,7 @@ resource "kubernetes_secret" "cloudflare-dns-token"{
 // TODO: fixme, this is never run??
 resource "null_resource" "apply_cert_manager_crds" {
   provisioner "local-exec" {
-    command = "kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.12.3/cert-manager.crds.yaml"
+    command = "kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.crds.yaml"
   }
 }
 
@@ -34,7 +34,7 @@ resource "kubernetes_manifest" "cert-manager" {
       "project" = "default"
       "source"  = {
         "repoURL"        = "https://charts.jetstack.io"
-        "targetRevision" = "v1.12.3"
+        "targetRevision" = "v1.17.1"
         "chart"          = "cert-manager"
       }
       "destination" = {
