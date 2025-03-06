@@ -114,7 +114,7 @@ hidden networkConfig: NetworkConfig = new NetworkConfig {
       new Machine {
         hostname = "novo"
         addr = cluster.raw_subnet.firstAddress.add(14).toString()
-        mac = "a4:fc:77:3a:e5:75"
+        mac = "5c:85:7e:3a:41:60"
         host_vars {
           bootloader = "grub"
         }
