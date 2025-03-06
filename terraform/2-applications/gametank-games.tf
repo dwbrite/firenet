@@ -105,9 +105,9 @@ resource "kubernetes_manifest" "vservice_gtg" {
           route = [
             {
               destination = {
-                host = "gtg"
+                host = "gametank-games"
                 port = {
-                  number = 80
+                  number = 41123
                 }
               }
             }
@@ -117,4 +117,3 @@ resource "kubernetes_manifest" "vservice_gtg" {
     }
   }
 }
-
