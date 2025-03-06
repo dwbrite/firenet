@@ -56,29 +56,6 @@ resource "kubernetes_manifest" "istio_istiod" {
   }
 }
 
-resource "kubernetes_service" "prometheus" {
-  metadata {
-    name      = "prometheus"
-    namespace = kubernetes_namespace.istio.metadata[0].name
-  }
-
-  spec {
-    type = "ClusterIP"
-
-    selector = {
-      app = "prometheus" # Make sure this matches the labels on your Prometheus pods
-    }
-
-    port {
-      port        = 9090
-      target_port = 9090
-      protocol    = "TCP"
-      name        = "http"
-    }
-  }
-}
-
-
 resource "kubernetes_manifest" "istio_ingress_gateway" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
@@ -155,6 +132,13 @@ resource "kubernetes_manifest" "istio_kiali" {
         repoURL        = "https://kiali.org/helm-charts"
         targetRevision = "1.77"
         chart          = "kiali-server"
+        helm = {
+          values = <<-EOT
+            external_services:
+              prometheus:
+                url: "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
+          EOT
+        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"

@@ -9,7 +9,7 @@ spec:
       protocol: TCP
       targetPort: 41123
   selector:
-    app: gametank-games
+    app.kubernetes.io/name: gametank-games
   sessionAffinity: None
   type: ClusterIP
 status:
