@@ -37,6 +37,17 @@ firewall {
                     related
                 }
             }
+            rule 29 {
+                action accept
+                state {
+                    new
+                }
+                destination {
+                    address 10.11.1.122
+                    port 25565
+                }
+                protocol tcp
+            }
             rule 30 {
                 action accept
                 state {
@@ -44,7 +55,7 @@ firewall {
                 }
                 destination {
                     address {{ cluster.ip }}
-                    port 80,443,9000,1337,25565
+                    port 80,443,9000,1337
                 }
                 protocol tcp
             }
@@ -123,11 +134,23 @@ nat {
     }
 
     destination {
+        rule 29 {
+            description web-server-wan
+            destination {
+                port 25565
+            }
+            inbound-interface name eth0
+            protocol tcp
+            translation {
+                address 10.11.1.122
+            }
+        }
+
         /* port forward from wan */
         rule 30 {
             description web-server-wan
             destination {
-                port 80,443,9000,1337,25565
+                port 80,443,9000,1337
             }
             inbound-interface name eth0
             protocol tcp

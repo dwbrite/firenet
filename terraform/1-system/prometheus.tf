@@ -22,8 +22,14 @@ resource "kubernetes_manifest" "kube_prometheus_stack" {
         "chart"          = "kube-prometheus-stack"
         "helm" = {
           "values" = <<-EOT
+            prometheusOperator:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+
             prometheus:
               prometheusSpec:
+                nodeSelector:
+                  kubernetes.io/arch: amd64
                 retention: 10d
                 storageSpec:
                   volumeClaimTemplate:
